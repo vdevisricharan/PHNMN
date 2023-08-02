@@ -10,12 +10,13 @@ import {
 } from "@mui/icons-material";
 import { styled } from "styled-components";
 import { mobile } from "../responsive";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
   ${mobile({
-    flexDirection: "column",
-  })}
+  flexDirection: "column",
+})}
 `;
 
 const Left = styled.div`
@@ -83,15 +84,15 @@ const ContactItem = styled.div`
 const Payment = styled.img`
   width: 50%;
   ${mobile({
-    width: "70%",
-  })}
+  width: "70%",
+})}
 `;
 
 const Footer = () => {
   return (
     <Container>
       <Left>
-        <Logo>ICON.</Logo>
+        <Link to="/"><Logo>ICON.</Logo></Link>
         <Desc>
           Redefining Fashion. Discover the latest trends and timeless styles
           with our curated collections. Elevate your wardrobe and express your

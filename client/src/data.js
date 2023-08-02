@@ -46,16 +46,19 @@ export const categories = [
     id: 1,
     img: "https://assets.therowdy.club/1681368991313SharkTeeapp4.jpg",
     title: "WOMEN'S FASHION",
+    cat: "woman"
   },
   {
     id: 2,
     img: "https://assets.therowdy.club/1683185911341florizao.jpg",
     title: "MEN'S STYLE",
+    cat: "man"
   },
   {
     id: 3,
     img: "https://assets.therowdy.club/1635328102705mugi.jpg",
     title: "ACCESSORIES",
+    cat: "accesories"
   },
 ];
 
