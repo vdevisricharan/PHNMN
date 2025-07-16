@@ -30,3 +30,7 @@ api/.cache/
 
 # Optional: ignore coverage reports
 coverage/
+.venv/
+.mypy_cache/
+script.py
+products_dump.json
