@@ -50,11 +50,11 @@ export default function CartPage() {
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
                 <ArrowBackOutlined className="mr-2" />
-                <span className="font-medium">Continue Shopping</span>
+                <span className="font-medium">CONTINUE SHOPPING</span>
               </Link>
             </div>
             <h1 className="text-3xl md:text-4xl font-light text-gray-900 tracking-wide">
-              Shopping cart ({cart.quantity})
+              SHOPPING CART ({cart.quantity})
             </h1>
             <div className="w-32"></div> {/* Spacer for center alignment */}
           </div>
@@ -63,11 +63,11 @@ export default function CartPage() {
             /* Empty Cart State */
             <div className="bg-white  shadow-lg p-12 text-center max-w-lg mx-auto">
               <ShoppingBagOutlined className="mx-auto mb-6 text-gray-400" style={{ fontSize: 80 }} />
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your cart is empty</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">YOUR CART IS EMPTY</h2>
               <p className="text-gray-600 mb-8">Looks like you have not added any items to your cart yet.</p>
               <Link href="/">
                 <button className="px-8 py-3 bg-gray-900 text-white  font-medium hover:bg-gray-800 transition-all duration-300 transform hover:scale-105">
-                  Start Shopping
+                  START SHOPPING
                 </button>
               </Link>
             </div>
@@ -77,7 +77,7 @@ export default function CartPage() {
               <div className="lg:col-span-2">
                 <div className="bg-white  shadow-lg overflow-hidden">
                   <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900">Items in your cart</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">ITEMS IN YOUR CART</h2>
                   </div>
                   
                   <div className="divide-y divide-gray-200">
@@ -123,21 +123,23 @@ export default function CartPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
                                 {/* Quantity Controls */}
-                                <div className="flex items-center border border-gray-300 ">
+                                <div className="flex items-center border border-gray-700 ">
                                   <button
-                                    className="p-2 hover:bg-gray-100 transition-colors"
+                                    className="p-2 text-black hover:bg-gray-100 transition-colors"
                                     onClick={() => dispatch(decreaseQuantity(product._id))}
                                     aria-label="Decrease quantity"
+                                    type="button"
                                   >
                                     <RemoveOutlined style={{ fontSize: 16 }} />
                                   </button>
-                                  <span className="px-4 py-2 text-center min-w-[3rem] font-medium">
+                                  <span className="px-4 py-2 text-black text-center min-w-[3rem] font-medium">
                                     {product.quantity ?? 0}
                                   </span>
                                   <button
-                                    className="p-2 hover:bg-gray-100 transition-colors"
+                                    className="p-2 text-black hover:bg-gray-100 transition-colors"
                                     onClick={() => dispatch(increaseQuantity(product._id))}
                                     aria-label="Increase quantity"
+                                    type="button"
                                   >
                                     <AddOutlined style={{ fontSize: 16 }} />
                                   </button>
@@ -145,9 +147,10 @@ export default function CartPage() {
 
                                 {/* Remove Button */}
                                 <button
-                                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                  className="p-2 text-black hover:text-red-500 transition-colors"
                                   onClick={() => dispatch(removeProduct(product._id))}
                                   aria-label="Remove product"
+                                  type="button"
                                 >
                                   <DeleteOutlined style={{ fontSize: 20 }} />
                                 </button>
@@ -175,19 +178,19 @@ export default function CartPage() {
               <div className="lg:col-span-1">
                 <div className="bg-white  shadow-lg sticky top-8">
                   <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">ORDER SUMMARY</h2>
                   </div>
                   
                   <div className="p-6 space-y-4">
                     <div className="flex justify-between text-gray-700">
-                      <span>Subtotal ({cart.quantity} items)</span>
+                      <span>SUBTOTAL ({cart.quantity} items)</span>
                       <span>₹{cart.total.toLocaleString()}</span>
                     </div>
                     
                     <div className="flex justify-between text-gray-700">
                       <span className="flex items-center">
                         <LocalShippingOutlined className="mr-2" style={{ fontSize: 16 }} />
-                        Shipping
+                        SHIPPING
                       </span>
                       <span className={shippingCost === 0 ? "text-green-600" : ""}>
                         {shippingCost === 0 ? "FREE" : `₹${shippingCost}`}
@@ -214,6 +217,7 @@ export default function CartPage() {
                     <button
                       className="w-full py-4 bg-gray-900 text-white font-medium  hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 mb-4"
                       onClick={handleCheckout}
+                      type="button"
                     >
                       Proceed to Checkout
                     </button>
@@ -233,7 +237,7 @@ export default function CartPage() {
                 </div>
                 
                 {/* Recommended Products */}
-                <div className="bg-white  shadow-lg mt-6 p-6">
+                {/* <div className="bg-white  shadow-lg mt-6 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">You might also like</h3>
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
@@ -244,7 +248,7 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           )}

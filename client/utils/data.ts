@@ -1,19 +1,21 @@
 export const sliderItems = [
   {
+    id: 1,
+    title: "SUMMER COLLECTION",
+    description: "Discover the hottest trends of the season",
+    button: "SHOP NOW",
+    bg: "#f3f5f2",
+    image_url: "https://assets.therowdy.club/1747318126995sky.jpg",
+    cat: "SUMMER",
+  },
+  {
     id: 2,
     title: "AUTUMN & WINTER COLLECTION",
     description: "Up to 30% off on selected items",
     button: "SHOP NOW",
     bg: "#a8a8a8",
     image_url: "https://assets.therowdy.club/1734208111810blackhoodie.jpg",
-  },
-  {
-    id: 3,
-    title: "SUMMER COLLECTION",
-    description: "Discover the hottest trends of the season",
-    button: "SHOP NOW",
-    bg: "#f3f5f2",
-    image_url: "https://assets.therowdy.club/1747318126995sky.jpg",
+    cat: "AUTUMN-WINTER",
   }
 ];
 
@@ -26,13 +28,13 @@ export const categories = [
   },
   {
     id: 2,
-    img: "https://assets.therowdy.club/17268910236712.jpg",
+    img: "https://assets.therowdy.club/1733317783350Brownnn.jpg",
     title: "BOTTOM WEAR",
     cat: "BOTTOM-WEAR",
   },
   {
     id: 3,
-    img: "https://assets.therowdy.club/1750139444449Rageee.jpg",
+    img: "https://assets.therowdy.club/1744355398750rwdysip.jpg",
     title: "ACCESSORIES",
     cat: "ACCESSORIES",
   },

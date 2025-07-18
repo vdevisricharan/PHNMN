@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ProductCard from "./ProductCard";
-import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 // {
 //     "inStock": true,
@@ -49,69 +50,39 @@ type ProductsProps = {
 };
 
 const Products = ({ cat, filters = {}, sort = "newest" }: ProductsProps) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { products, loading, error } = useSelector((state: RootState) => state.products);
+  console.log(cat);
+  // Filtering
+  let filteredProducts = products;
+  if (cat) {
+    filteredProducts = filteredProducts.filter((item) =>
+      item.categories?.includes(cat)
+    );
+    filteredProducts = filteredProducts.filter((item) =>
+      Object.entries(filters).every(([key, value]) => {
+        const field = key as keyof Product;
+        const fieldValue = item[field];
+        if (Array.isArray(fieldValue)) {
+          return fieldValue.includes(value);
+        }
+        return fieldValue === value;
+      })
+    );
+  }
 
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await axios.get(
-          cat
-            ? `${process.env.NEXT_PUBLIC_API_URL}/products?category=${cat}`
-            : `${process.env.NEXT_PUBLIC_API_URL}/products`
-        );
-        setProducts(res.data);
-      } catch (error) {
-        setError("Failed to load products. Please try again.");
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getProducts();
-  }, [cat]);
-
-  useEffect(() => {
-    if (cat) {
-      setFilteredProducts(
-        products.filter((item) =>
-          Object.entries(filters).every(([key, value]) => {
-            const field = key as keyof Product;
-            const fieldValue = item[field];
-            if (Array.isArray(fieldValue)) {
-              return fieldValue.includes(value);
-            }
-            return fieldValue === value;
-          })
-        )
-      );
-    }
-  }, [products, cat, filters]);
-
-  useEffect(() => {
-    if (sort === "newest") {
-      setFilteredProducts((prev) =>
-        [...prev].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-      );
-    } else if (sort === "asc") {
-      setFilteredProducts((prev) =>
-        [...prev].sort((a, b) => (a.price || 0) - (b.price || 0))
-      );
-    } else {
-      setFilteredProducts((prev) =>
-        [...prev].sort((a, b) => (b.price || 0) - (a.price || 0))
-      );
-    }
-  }, [sort]);
+  // Sorting
+  if (sort === "newest") {
+    filteredProducts = [...filteredProducts].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  } else if (sort === "asc") {
+    filteredProducts = [...filteredProducts].sort((a, b) => (a.price || 0) - (b.price || 0));
+  } else {
+    filteredProducts = [...filteredProducts].sort((a, b) => (b.price || 0) - (a.price || 0));
+  }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="animate-spin h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -122,7 +93,7 @@ const Products = ({ cat, filters = {}, sort = "newest" }: ProductsProps) => {
         <p className="text-red-500 text-lg mb-4">{error}</p>
         <button 
           onClick={() => window.location.reload()} 
-          className="px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+          className="px-6 py-3 bg-gray-900 text-white hover:bg-gray-800 transition-colors"
           type="button"
         >
           Try Again
@@ -137,7 +108,7 @@ const Products = ({ cat, filters = {}, sort = "newest" }: ProductsProps) => {
     <section className="py-16 px-6 max-w-7xl mx-auto">
       {!cat && (
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">FEATURED PRODUCTS</h2>
+          <h2 className="text-4xl font-bold text-white mb-4">{cat || "FEATURED PRODUCTS"}</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Discover our latest collection of premium fashion items
           </p>

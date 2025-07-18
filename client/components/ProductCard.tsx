@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   FavoriteBorderOutlined,
@@ -9,20 +9,28 @@ import {
   FavoriteOutlined,
 } from "@mui/icons-material";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "@/redux/slices/cartSlice";
+import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlistSlice";
 import type { Product } from "./Products";
+import type { RootState } from "@/redux/store";
 
 interface ProductCardProps {
   item: Product;
 }
 
 const ProductCard = ({ item }: ProductCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const dispatch = useDispatch();
+  const isWishlisted = useSelector((state: RootState) =>
+    state.wishlist.products.some((p) => p._id === item._id)
+  );
 
   const handleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(item._id));
+    } else {
+      dispatch(addToWishlist(item));
+    }
   };
 
   const handleAddToCart = () => {

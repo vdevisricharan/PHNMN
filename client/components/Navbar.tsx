@@ -25,7 +25,7 @@ const Navbar = () => {
             <option value="es">ES</option>
           </select>
         </div>
-        
+
         <div className="relative">
           <div className="flex items-center bg-gray-50 hover:bg-gray-100 transition-colors duration-200 px-4 py-2 border border-gray-200 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-200">
             <Search className="text-gray-400 mr-2" style={{ fontSize: 20 }} />
@@ -59,17 +59,22 @@ const Navbar = () => {
               SIGN IN
             </span>
           </Link>
+          <Link href='/wishlist'>
+            <span className="text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer transition-colors duration-200 tracking-wide">
+              WISHLIST
+            </span>
+          </Link>
         </div>
-        
+
         {/* Mobile menu for auth */}
         <div className="sm:hidden">
           <PersonOutlined className="cursor-pointer text-gray-700 hover:text-gray-900 transition-colors duration-200" />
         </div>
-        
+
         <Link href="/cart">
           <div className="relative cursor-pointer group">
-            <Badge 
-              badgeContent={quantity} 
+            <Badge
+              badgeContent={quantity}
               color="primary"
               sx={{
                 '& .MuiBadge-badge': {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@mui/icons-material";
 import { sliderItems } from "../utils/data";
 import Image from "next/image";
+import Link from "next/link";
 
 const Slider = () => {
   const [slideIndex, setSlideIndex] = useState(0);
@@ -85,13 +86,16 @@ const Slider = () => {
                 <p className="text-xl text-gray-700 mb-8 leading-relaxed font-light">
                   {item.description}
                 </p>
-                <button className="group/btn inline-flex items-center px-8 py-4 text-lg font-medium text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                  aria-label="Shop Now"
-                  type="button"
-                >
-                  {item.button}
-                  <ArrowRightOutlined className="ml-2 transition-transform duration-300 group-hover/btn:translate-x-1" />
-                </button>
+                <Link href={`/products/${encodeURIComponent(item.cat)}`}>
+                  <button
+                    className="group/btn inline-flex items-center px-8 py-4 text-lg font-medium text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                    aria-label="Shop Now"
+                    type="button"
+                  >
+                    {item.button}
+                    <ArrowRightOutlined className="ml-2 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
