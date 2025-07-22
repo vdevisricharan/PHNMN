@@ -3,29 +3,27 @@
 import React from "react";
 import { Search, ShoppingCartOutlined, PersonOutlined } from "@mui/icons-material";
 import Badge from "@mui/material/Badge";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import { RootState } from '../redux/store';
+import { logout } from "../redux/apiCalls";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const quantity = useSelector((state: RootState) => state.cart.quantity);
+  const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout(dispatch);
+    router.push("/");
+  };
 
   return (
     <nav className="h-20 flex items-center px-4 lg:px-8 justify-between bg-white shadow-md border-b border-gray-100 sticky top-0 z-50">
       {/* Left Section */}
       <div className="flex-1 flex items-center space-x-6">
-        <div className="hidden md:block">
-          <select
-            className="text-sm font-medium text-gray-700 bg-transparent cursor-pointer outline-none border-none"
-            aria-label="Select language"
-            title="Select language"
-          >
-            <option value="en">EN</option>
-            <option value="fr">FR</option>
-            <option value="es">ES</option>
-          </select>
-        </div>
-
         <div className="relative">
           <div className="flex items-center bg-gray-50 hover:bg-gray-100 transition-colors duration-200 px-4 py-2 border border-gray-200 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-200">
             <Search className="text-gray-400 mr-2" style={{ fontSize: 20 }} />
@@ -49,16 +47,27 @@ const Navbar = () => {
       {/* Right Section */}
       <div className="flex-1 flex items-center justify-end space-x-6">
         <div className="hidden sm:flex items-center space-x-6">
-          <Link href="/register">
-            <span className="text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer transition-colors duration-200 tracking-wide">
-              REGISTER
-            </span>
-          </Link>
-          <Link href="/login">
-            <span className="text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer transition-colors duration-200 tracking-wide">
-              SIGN IN
-            </span>
-          </Link>
+          {currentUser ? (
+            <>
+              <span className="text-sm font-medium text-gray-700 cursor-default tracking-wide">
+                Hello, {currentUser.username || 'User'}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="ml-4 text-sm font-medium text-red-600 hover:text-red-800 transition-colors duration-200 tracking-wide"
+              >
+                LOGOUT
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <span className="text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer transition-colors duration-200 tracking-wide">
+                  SIGN IN
+                </span>
+              </Link>
+            </>
+          )}
           <Link href='/wishlist'>
             <span className="text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer transition-colors duration-200 tracking-wide">
               WISHLIST

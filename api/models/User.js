@@ -23,6 +23,7 @@ const UserSchema = new mongoose.Schema({
     minlength: [6, "Password must be at least 6 characters long"],
   },
   isAdmin: { type: Boolean, default: false },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 }, { timestamps: true });
 
 UserSchema.post('save', function(error, doc, next) {

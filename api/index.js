@@ -13,6 +13,8 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const connectDB = require("./db/connection");
+const favicon = require('serve-favicon');
+const path = require('path');
 
 dotenv.config();
 connectDB(); // Connect to MongoDB before starting the server
@@ -32,6 +34,8 @@ app.use("/api/checkout", stripeRoute);
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Phenomenon API is running." });
 });
+
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 const PORT = process.env.PORT || 5000;
 let server;

@@ -116,6 +116,137 @@ const router = require("express").Router();
  *         description: Server error
  */
 
+/**
+ * @swagger
+ * /api/users/wishlist:
+ *   post:
+ *     summary: Add a product to the user's wishlist
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 description: The ID of the product to add
+ *     responses:
+ *       200:
+ *         description: Product added to wishlist
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Server error
+ *   get:
+ *     summary: Get the user's wishlist
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Wishlist retrieved
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ *
+ * /api/users/wishlist/{productId}:
+ *   delete:
+ *     summary: Remove a product from the user's wishlist
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to remove
+ *     responses:
+ *       200:
+ *         description: Product removed from wishlist
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Product not found in wishlist
+ *       500:
+ *         description: Server error
+ */
+
+const { verifyToken } = require("../middleware/verifyToken");
+const Product = require("../models/Product");
+
+// Add product to wishlist
+router.post("/wishlist", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { productId } = req.body;
+  if (!productId) {
+    return res.status(400).json({ error: "Product ID is required." });
+  }
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found." });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    if (user.wishlist.includes(productId)) {
+      return res.status(200).json({ message: "Product already in wishlist." });
+    }
+    user.wishlist.push(productId);
+    await user.save();
+    res.status(200).json({ message: "Product added to wishlist.", wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Remove product from wishlist
+router.delete("/wishlist/:productId", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { productId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    const index = user.wishlist.indexOf(productId);
+    if (index === -1) {
+      return res.status(404).json({ error: "Product not found in wishlist." });
+    }
+    user.wishlist.splice(index, 1);
+    await user.save();
+    res.status(200).json({ message: "Product removed from wishlist.", wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user's wishlist (populated)
+router.get("/wishlist", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const user = await User.findById(userId).populate("wishlist");
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    res.status(200).json({ wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // UPDATE
 router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
   if (req.body.password) {
