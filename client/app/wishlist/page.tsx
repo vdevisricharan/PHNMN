@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
+import Footer from "@/components/Footer";
 
 export default function WishlistPage() {
   const wishlist = useSelector((state: RootState) => state.wishlist.products);
@@ -24,6 +25,7 @@ export default function WishlistPage() {
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

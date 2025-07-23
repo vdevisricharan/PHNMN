@@ -12,6 +12,7 @@ export default function SuccessPage() {
       <button
         className="px-6 py-3 mt-4 bg-[#bf2132] text-white font-semibold transition-colors duration-200 hover:bg-red-700"
         onClick={() => router.push("/")}
+        type="button"
       >
         Go to Homepage
       </button>

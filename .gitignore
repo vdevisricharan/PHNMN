@@ -35,3 +35,4 @@ coverage/
 script.py
 products_dump.json
 client-vitejs
+.hintrc

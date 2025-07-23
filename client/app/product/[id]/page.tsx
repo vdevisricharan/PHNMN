@@ -6,6 +6,7 @@ import { addProduct } from "@/redux/slices/cartSlice";
 import type { RootState } from "@/redux/store";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -248,6 +249,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
