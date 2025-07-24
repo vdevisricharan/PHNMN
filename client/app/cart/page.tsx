@@ -5,10 +5,10 @@ import type { RootState } from "@/redux/store";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import { increaseQuantity, decreaseQuantity, removeProduct } from "@/redux/slices/cartSlice";
-import { 
-  DeleteOutlined, 
-  AddOutlined, 
-  RemoveOutlined, 
+import {
+  DeleteOutlined,
+  AddOutlined,
+  RemoveOutlined,
   ShoppingBagOutlined,
   LocalShippingOutlined,
   SecurityOutlined,
@@ -54,7 +54,7 @@ export default function CartPage() {
               </Link>
             </div>
             <h1 className="order-1 sm:order-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 tracking-wide text-center sm:text-center flex-1">
-              SHOPPING CART ({cart.quantity})
+              CART ({cart.quantity})
             </h1>
           </div>
 
@@ -65,7 +65,11 @@ export default function CartPage() {
               <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">YOUR CART IS EMPTY</h2>
               <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Looks like you have not added any items to your cart yet.</p>
               <Link href="/">
-                <button className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base">
+                <button
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
+                  type="button"
+                  aria-label="Start Shopping"
+                >
                   START SHOPPING
                 </button>
               </Link>
@@ -78,7 +82,7 @@ export default function CartPage() {
                   <div className="p-4 sm:p-6 border-b border-gray-200">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-900">ITEMS IN YOUR CART</h2>
                   </div>
-                  
+
                   <div className="divide-y divide-gray-200">
                     {cart.products.map((product: Product) => (
                       <div key={product._id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
@@ -105,7 +109,7 @@ export default function CartPage() {
                             <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 text-center sm:text-left">
                               {product.title || "Product Name"}
                             </h3>
-                            
+
                             <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-4">
                               {product.selectedSize && (
                                 <span className="bg-gray-100 px-2 sm:px-3 py-1">
@@ -180,13 +184,13 @@ export default function CartPage() {
                   <div className="p-4 sm:p-6 border-b border-gray-200">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-900">ORDER SUMMARY</h2>
                   </div>
-                  
+
                   <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                     <div className="flex justify-between text-sm sm:text-base text-gray-700">
                       <span>SUBTOTAL ({cart.quantity} items)</span>
                       <span className="font-medium">₹{cart.total.toLocaleString()}</span>
                     </div>
-                    
+
                     <div className="flex justify-between text-sm sm:text-base text-gray-700">
                       <span className="flex items-center">
                         <LocalShippingOutlined className="mr-2" style={{ fontSize: 16 }} />
@@ -196,7 +200,7 @@ export default function CartPage() {
                         {shippingCost === 0 ? "FREE" : `₹${shippingCost}`}
                       </span>
                     </div>
-                    
+
                     {cart.total < 1000 && (
                       <div className="bg-blue-50 border border-blue-200 p-3">
                         <p className="text-xs sm:text-sm text-blue-700">
@@ -204,7 +208,7 @@ export default function CartPage() {
                         </p>
                       </div>
                     )}
-                    
+
                     <div className="border-t border-gray-200 pt-3 sm:pt-4">
                       <div className="flex justify-between text-lg sm:text-xl font-semibold text-gray-900">
                         <span>Total</span>
@@ -212,7 +216,7 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-4 sm:p-6 border-t border-gray-200">
                     <button
                       className="w-full py-3 sm:py-4 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 mb-4 text-sm sm:text-base touch-manipulation"
@@ -221,7 +225,7 @@ export default function CartPage() {
                     >
                       Proceed to Checkout
                     </button>
-                    
+
                     {/* Security Features - Responsive text and spacing */}
                     <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-gray-600">
                       <div className="flex items-center">
@@ -235,7 +239,7 @@ export default function CartPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Recommended Products - Commented out but responsive ready */}
                 {/* <div className="bg-white shadow-lg mt-6 p-4 sm:p-6">
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">You might also like</h3>

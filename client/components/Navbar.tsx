@@ -186,25 +186,32 @@ const Navbar = () => {
           {/* Cart Icon */}
           <Link href="/cart" onClick={closeMenu}>
             <div className="relative cursor-pointer group p-1">
-              <Badge
-                badgeContent={quantity}
-                color="primary"
-                sx={{
-                  '& .MuiBadge-badge': {
-                    backgroundColor: '#1f2937',
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    fontWeight: 'bold',
-                    height: '18px',
-                    minWidth: '18px',
-                  }
-                }}
-              >
+              {hasMounted ? (
+                <Badge
+                  badgeContent={quantity}
+                  color="primary"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      backgroundColor: '#1f2937',
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      fontWeight: 'bold',
+                      height: '18px',
+                      minWidth: '18px',
+                    }
+                  }}
+                >
+                  <ShoppingCartOutlined 
+                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200" 
+                    style={{ fontSize: 22 }} 
+                  />
+                </Badge>
+              ) : (
                 <ShoppingCartOutlined 
                   className="text-gray-700 hover:text-gray-900 transition-colors duration-200" 
                   style={{ fontSize: 22 }} 
                 />
-              </Badge>
+              )}
             </div>
           </Link>
         </div>

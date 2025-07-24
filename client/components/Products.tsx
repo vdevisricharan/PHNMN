@@ -56,7 +56,7 @@ const Products = ({ cat, filters = {}, sort = "newest" }: ProductsProps) => {
           <p className="text-red-500 text-base sm:text-lg mb-4 sm:mb-6">{error}</p>
           <button 
             onClick={() => router.refresh()} 
-            className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white hover:bg-gray-800 focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200 rounded text-sm sm:text-base font-medium"
+            className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white hover:bg-gray-800 focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200 text-sm sm:text-base font-medium"
             type="button"
           >
             Try Again

@@ -1,37 +1,45 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Username is required"],
-    unique: true,
-    minlength: [3, "Username must be at least 3 characters long"],
-    maxlength: [30, "Username must be less than 30 characters"],
-    trim: true,
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-    match: [/.+@.+\..+/, "Please enter a valid email address"],
-    lowercase: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minlength: [6, "Password must be at least 6 characters long"],
-  },
+const addressSchema = new mongoose.Schema({
+  label: String,
+  fullName: String,
+  phone: String,
+  street: String,
+  city: String,
+  state: String,
+  postalCode: String,
+  country: String,
+  isDefault: Boolean,
+  createdAt: { type: Date, default: Date.now }
+}, { _id: true });
+
+const cartItemSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  size: String,
+  color: String,
+  quantity: { type: Number, default: 1 },
+  addedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
+const wishlistItemSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  addedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true, required: true },
+  passwordHash: { type: String, required: true },
+  phone: String,
+  stripeCustomerId: String,
   isAdmin: { type: Boolean, default: false },
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-}, { timestamps: true });
 
-UserSchema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoServerError' && error.code === 11000) {
-    next(new Error('Duplicate field value entered.'));
-  } else {
-    next(error);
-  }
+  cart: [cartItemSchema],
+  wishlist: [wishlistItemSchema],
+  addresses: [addressSchema],
+
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model('User', userSchema);

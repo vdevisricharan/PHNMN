@@ -1,48 +1,41 @@
+// models/Order.js
+const mongoose = require('mongoose');
 
-const mongoose = require("mongoose");
+const orderItemSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  name: String,
+  size: String,
+  color: String,
+  quantity: Number,
+  price: Number
+}, { _id: false });
 
-const OrderSchema = new mongoose.Schema({
-  userId: {
-    type: String,
-    required: [true, "User ID is required"],
-    trim: true,
-  },
-  products: [
-    {
-      productId: {
-        type: String,
-        required: [true, "Product ID is required"],
-        trim: true,
-      },
-      quantity: {
-        type: Number,
-        default: 1,
-        min: [1, "Quantity must be at least 1"],
-      },
-    },
-  ],
-  amount: {
-    type: Number,
-    required: [true, "Amount is required"],
-    min: [0, "Amount must be positive"],
-  },
-  address: {
-    type: Object,
-    required: [true, "Address is required"],
-  },
+const addressSnapshotSchema = new mongoose.Schema({
+  fullName: String,
+  phone: String,
+  street: String,
+  city: String,
+  state: String,
+  postalCode: String,
+  country: String
+}, { _id: false });
+
+const orderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  addressSnapshot: addressSnapshotSchema,
+  items: [orderItemSchema],
+  subtotal: Number,
+  discount: { type: Number, default: 0 },
+  shippingFee: { type: Number, default: 0 },
+  totalAmount: Number,
   status: {
     type: String,
-    default: "pending",
-    enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    default: 'pending'
   },
-}, { timestamps: true });
-
-OrderSchema.post('save', function(error, doc, next) {
-  if (error.name === 'ValidationError') {
-    next(new Error('Order validation failed.'));
-  } else {
-    next(error);
-  }
+  couponCode: String,
+  placedAt: { type: Date, default: Date.now },
+  cancelledAt: Date
 });
 
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = mongoose.model('Order', orderSchema);

@@ -49,7 +49,7 @@ export default function LoginPage() {
             LOGIN
           </button>
           {error && <span className="text-gray-500 text-sm text-center">Something went wrong</span>}
-          <a className="text-xs underline text-gray-600 cursor-pointer text-center">FORGOT PASSWORD?</a>
+          {/* <a className="text-xs underline text-gray-600 cursor-pointer text-center">FORGOT PASSWORD?</a> */}
           <a href="/register" className="text-xs underline text-gray-600 cursor-pointer text-center">CREATE A NEW ACCOUNT</a>
         </form>
       </div>

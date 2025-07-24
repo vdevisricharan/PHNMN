@@ -1,52 +1,27 @@
-const mongoose = require("mongoose");
+// models/Product.js
+const mongoose = require('mongoose');
 
-const ProductSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, "Product title is required"],
-    trim: true,
-    minlength: [2, "Title must be at least 2 characters"],
-    maxlength: [100, "Title must be less than 100 characters"],
+const productSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  brand: String,
+  category: String,
+  images: [String],
+  price: { type: Number, required: true },
+  discount: { type: Number, default: 0 }, // percentage
+  sizes: [String],
+  colors: [String],
+  stock: {
+    type: Map,
+    of: Number // e.g., { "S": 10, "M": 5 }
   },
-  desc: {
-    type: String,
-    required: [true, "Description is required"],
-    trim: true,
-    maxlength: [1000, "Description too long"],
-  },
-  img: {
-    type: String,
-    required: [true, "Image URL is required"],
-    trim: true,
-  },
-  categories: {
-    type: [String],
-    default: [],
-  },
-  size: {
-    type: [String],
-    default: [],
-  },
-  color: {
-    type: [String],
-    default: [],
-  },
-  price: {
-    type: Number,
-    required: [true, "Price is required"],
-    min: [0, "Price must be positive"],
-  },
-  inStock: { type: Boolean, default: true },
-}, { timestamps: true });
+  tags: [String],
+  rating: { type: Number, default: 0 },
+  reviewsCount: { type: Number, default: 0 },
+  isFeatured: { type: Boolean, default: false },
 
-ProductSchema.index({ title: 1, color: 1 }, { unique: true });
-
-ProductSchema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoServerError' && error.code === 11000) {
-    next(new Error('Duplicate product title entered.'));
-  } else {
-    next(error);
-  }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Product", ProductSchema);
+module.exports = mongoose.model('Product', productSchema);
