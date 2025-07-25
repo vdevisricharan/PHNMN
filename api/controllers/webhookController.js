@@ -1,7 +1,8 @@
-const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
-const Payment = require('../../models/Payment');
+const Payment = require('../models/Payment');
 const dotenv = require('dotenv');
 dotenv.config();
+
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 exports.handleStripeWebhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];

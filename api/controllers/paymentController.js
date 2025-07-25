@@ -1,5 +1,8 @@
-const Payment = require('../../models/Payment');
-const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
+const Payment = require('../models/Payment');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 exports.createPaymentIntent = async (req, res) => {
   const { amount, currency = 'usd' } = req.body;

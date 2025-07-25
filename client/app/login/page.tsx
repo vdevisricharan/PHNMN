@@ -6,7 +6,7 @@ import type { RootState } from "@/redux/store";
 import { login } from "@/redux/apiCalls";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const { isFetching, error, currentUser } = useSelector((state: RootState) => state.user);
@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   const handleClick = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(dispatch, { username, password });
+    await login(dispatch, { email, password });
   };
 
   return (
@@ -30,9 +30,10 @@ export default function LoginPage() {
         <form className="flex flex-col gap-4" onSubmit={handleClick}>
           <input
             className="px-4 py-2 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
-            placeholder="username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            placeholder="email"
+            value={email}
+            type="email"
+            onChange={e => setEmail(e.target.value)}
           />
           <input
             className="px-4 py-2 text-black border border-gray-300  focus:outline-none focus:ring-2 focus:ring-gray-400"

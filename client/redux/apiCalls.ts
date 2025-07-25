@@ -3,10 +3,10 @@ import { loginStart, loginSuccess, loginFailure, logout as logoutAction } from "
 import type { AppDispatch } from "./store";
 import Cookies from "js-cookie";
 
-export const login = async (dispatch: AppDispatch, user: { username: string; password: string }) => {
+export const login = async (dispatch: AppDispatch, user: { email: string; password: string }) => {
   dispatch(loginStart());
   try {
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, user);
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/login`, user);
     // Store accessToken in cookies
     if (res.data.accessToken) {
       Cookies.set("accessToken", res.data.accessToken, { expires: 7 });
@@ -18,7 +18,7 @@ export const login = async (dispatch: AppDispatch, user: { username: string; pas
 };
 
 export const register = async (data: { username: string; email: string; password: string }) => {
-  const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, data);
+  const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, data);
   // Optionally store token if returned on register (if your backend does this)
   if (res.data.accessToken) {
     Cookies.set("accessToken", res.data.accessToken, { expires: 7 });

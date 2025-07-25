@@ -3,8 +3,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./swagger.json');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const stripe = require('stripe')('YOUR_STRIPE_SECRET_KEY');
+const dotenv = require('dotenv')
 
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 const connectDB = require("./db/connection");
 const favicon = require('serve-favicon');
 const path = require('path');
@@ -23,11 +24,11 @@ connectDB(); // Connect to MongoDB before starting the server
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 // API Routes
-app.use('/api/users', require('./api/routes/user'));
-app.use('/api/products', require('./api/routes/product'));
-app.use('/api/orders', require('./api/routes/order'));
-app.use('/api/payments', require('./api/routes/payment'));
-app.use('/api/webhook', require('./api/routes/webhook'));
+app.use('/api/users', require('./routes/user'));
+app.use('/api/products', require('./routes/product'));
+app.use('/api/orders', require('./routes/order'));
+app.use('/api/payments', require('./routes/payment'));
+app.use('/api/webhook', require('./routes/webhook'));
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Phenomenon API is running." });

@@ -1,4 +1,4 @@
-const Order = require('../../models/Order');
+const Order = require('../models/Order');
 
 exports.placeOrder = async (req, res) => {
   const { items, addressSnapshot, subtotal, totalAmount } = req.body;
