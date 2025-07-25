@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  brand: String,
-  category: String,
+  category: [String],
   images: [String],
   price: { type: Number, required: true },
   discount: { type: Number, default: 0 }, // percentage

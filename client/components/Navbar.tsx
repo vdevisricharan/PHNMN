@@ -11,10 +11,12 @@ import {
   LogoutOutlined,
   AccountCircleOutlined,
   ListAltOutlined,
-  LocationOnOutlined
+  LocationOnOutlined,
+  AccountBalanceWalletOutlined,
+  StarsOutlined
 } from "@mui/icons-material";
 import Badge from "@mui/material/Badge";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector} from "react-redux";
 import Link from "next/link";
 import { RootState } from '../redux/store';
 import { logout } from "../redux/apiCalls";
@@ -29,11 +31,10 @@ const Navbar = () => {
   
   const quantity = useSelector((state: RootState) => state.cart.quantity);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const dispatch = useDispatch();
   const router = useRouter();
 
   const handleLogout = () => {
-    logout(dispatch);
+    logout();
     router.push("/");
     setIsMenuOpen(false);
     setIsProfileModalOpen(false);
@@ -66,7 +67,7 @@ const Navbar = () => {
 
   // Get first letter of username for profile avatar
   const getInitial = () => {
-    return currentUser?.username ? currentUser.username.charAt(0).toUpperCase() : 'U';
+    return currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
   };
 
   // Close menu on resize to desktop
@@ -135,7 +136,7 @@ const Navbar = () => {
         <div className="flex-1 md:flex-initial flex justify-center md:justify-center">
           <Link href="/" onClick={closeMenu}>
             <span className="font-bold text-xl md:text-2xl lg:text-3xl tracking-[0.1em] md:tracking-[0.2em] cursor-pointer text-gray-900 hover:text-gray-700 transition-colors duration-200">
-              PHENOMENON
+              PHNMN
             </span>
           </Link>
         </div>
@@ -147,6 +148,7 @@ const Navbar = () => {
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             className="md:hidden p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200"
             aria-label="Search"
+            type="button"
           >
             <Search style={{ fontSize: 22 }} />
           </button>
@@ -233,10 +235,10 @@ const Navbar = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {currentUser.username || 'User'}
+                    {currentUser.name}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
-                    {currentUser.email || 'user@example.com'}
+                    {currentUser.email}
                   </p>
                 </div>
               </div>
@@ -248,6 +250,20 @@ const Navbar = () => {
                 <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
                   <AccountCircleOutlined className="text-gray-600" style={{ fontSize: 18 }} />
                   <span className="text-sm text-gray-700">My Profile</span>
+                </div>
+              </Link>
+
+              <Link href="/profile/wallet" onClick={closeProfileModal}>
+                <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <AccountBalanceWalletOutlined className="text-gray-600" style={{ fontSize: 18 }} />
+                  <span className="text-sm text-gray-700">My Wallet</span>
+                </div>
+              </Link>
+
+              <Link href="/profile/points" onClick={closeProfileModal}>
+                <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <StarsOutlined className="text-gray-600" style={{ fontSize: 18 }} />
+                  <span className="text-sm text-gray-700">My Points</span>
                 </div>
               </Link>
 
@@ -328,12 +344,13 @@ const Navbar = () => {
             {/* Menu Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <span className="font-bold text-xl tracking-[0.1em] text-gray-900">
-                PHENOMENON
+                PHNMN
               </span>
               <button
                 onClick={closeMenu}
                 className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
                 aria-label="Close menu"
+                type="button"
               >
                 <CloseOutlined style={{ fontSize: 24 }} />
               </button>
@@ -350,10 +367,10 @@ const Navbar = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {currentUser.username || 'User'}
+                          {currentUser.name}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {currentUser.email || 'user@example.com'}
+                          {currentUser.email}
                         </p>
                       </div>
                     </div>
@@ -363,6 +380,27 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <AccountCircleOutlined className="text-gray-600" />
                       <span className="text-base text-gray-700">Profile</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/profile/wallet" onClick={closeMenu}>
+                    <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
+                      <AccountBalanceWalletOutlined className="text-gray-600" />
+                      <span className="text-base text-gray-700">Wallet</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/profile/points" onClick={closeMenu}>
+                    <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
+                      <StarsOutlined className="text-gray-600" />
+                      <span className="text-base text-gray-700">Points</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/orders" onClick={closeMenu}>
+                    <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
+                      <ListAltOutlined className="text-gray-600" />
+                      <span className="text-base text-gray-700">Orders</span>
                     </div>
                   </Link>
                 </>

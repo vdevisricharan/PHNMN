@@ -14,7 +14,7 @@ const AboutUsPage = () => {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-lg text-gray-700 leading-relaxed mb-8">
-                Welcome to Phenomenon! We are passionate about delivering exceptional products and outstanding customer experiences. Our journey began with a simple idea: to make quality and innovation accessible to everyone.
+                Welcome to PHNMN! We are passionate about delivering exceptional products and outstanding customer experiences. Our journey began with a simple idea: to make quality and innovation accessible to everyone.
               </p>
 
               <div className="bg-blue-50  p-6 mb-8">
@@ -51,7 +51,7 @@ const AboutUsPage = () => {
 
               <div className="text-center bg-gray-50  p-6">
                 <p className="text-lg text-gray-700">
-                  Thank you for choosing Phenomenon. We look forward to serving you!
+                  Thank you for choosing PHNMN. We look forward to serving you!
                 </p>
               </div>
             </div>

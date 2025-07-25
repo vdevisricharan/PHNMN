@@ -1,10 +1,11 @@
 "use client";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import type { RootState } from "@/redux/store";
+import type { RootState, AppDispatch } from "@/redux/store";
+import type { CartItemPopulated } from "@/redux/types";
+import { updateCartItem, removeFromCart } from "@/redux/slices/cartSlice";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
-import { increaseQuantity, decreaseQuantity, removeProduct } from "@/redux/slices/cartSlice";
 import {
   DeleteOutlined,
   AddOutlined,
@@ -17,25 +18,13 @@ import {
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-interface Product {
-  _id: string;
-  img?: string;
-  price?: number;
-  quantity?: number;
-  title?: string;
-  size?: string[];   // <-- should be string[] | undefined
-  color?: string[];  // <-- should be string[] | undefined
-  selectedSize?: string;
-  selectedColor?: string;
-}
-
 export default function CartPage() {
   const cart = useSelector((state: RootState) => state.cart);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
   const handleCheckout = () => {
-    router.push("/success");
+    router.push("/checkout");
   };
 
   const shippingCost = cart.total > 1000 ? 0 : 99;
@@ -58,7 +47,7 @@ export default function CartPage() {
             </h1>
           </div>
 
-          {cart.products.length === 0 ? (
+          {cart.items.length === 0 ? (
             /* Empty Cart State - Enhanced responsiveness */
             <div className="bg-white shadow-lg p-6 sm:p-8 lg:p-12 text-center max-w-sm sm:max-w-lg mx-auto">
               <ShoppingBagOutlined className="mx-auto mb-4 sm:mb-6 text-gray-400 text-[60px] sm:text-[80px]" />
@@ -84,15 +73,15 @@ export default function CartPage() {
                   </div>
 
                   <div className="divide-y divide-gray-200">
-                    {cart.products.map((product: Product) => (
-                      <div key={product._id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
+                    {cart.items.map((item: CartItemPopulated) => (
+                      <div key={`${item.productId._id}-${item.color}-${item.size}`} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
                         <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                           {/* Product Image - Responsive sizing */}
                           <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-gray-100 overflow-hidden mx-auto sm:mx-0">
-                            {product.img ? (
+                            {item.productId.images?.[0] ? (
                               <Image
-                                src={product.img}
-                                alt={product.title || "Product Image"}
+                                src={item.productId.images[0]}
+                                alt={item.productId.name}
                                 width={112}
                                 height={112}
                                 className="w-full h-full object-cover"
@@ -107,18 +96,18 @@ export default function CartPage() {
                           {/* Product Details - Mobile-first layout */}
                           <div className="flex-1 min-w-0 w-full">
                             <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 text-center sm:text-left">
-                              {product.title || "Product Name"}
+                              {item.productId.name}
                             </h3>
 
                             <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-4">
-                              {product.selectedSize && (
+                              {item.size && (
                                 <span className="bg-gray-100 px-2 sm:px-3 py-1">
-                                  Size: {product.selectedSize}
+                                  Size: {item.size}
                                 </span>
                               )}
-                              {product.selectedColor && (
+                              {item.color && (
                                 <span className="bg-gray-100 px-2 sm:px-3 py-1">
-                                  Color: {product.selectedColor}
+                                  Color: {item.color}
                                 </span>
                               )}
                             </div>
@@ -130,18 +119,18 @@ export default function CartPage() {
                                 <div className="flex items-center border border-gray-700">
                                   <button
                                     className="p-2 sm:p-2 text-black hover:bg-gray-100 transition-colors touch-manipulation"
-                                    onClick={() => dispatch(decreaseQuantity(product._id))}
+                                    onClick={() => dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity - 1 }))}
                                     aria-label="Decrease quantity"
                                     type="button"
                                   >
                                     <RemoveOutlined style={{ fontSize: 16 }} />
                                   </button>
                                   <span className="px-3 sm:px-4 py-2 text-black text-center min-w-[3rem] font-medium">
-                                    {product.quantity ?? 0}
+                                    {item.quantity}
                                   </span>
                                   <button
                                     className="p-2 sm:p-2 text-black hover:bg-gray-100 transition-colors touch-manipulation"
-                                    onClick={() => dispatch(increaseQuantity(product._id))}
+                                    onClick={() => dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity + 1 }))}
                                     aria-label="Increase quantity"
                                     type="button"
                                   >
@@ -152,7 +141,7 @@ export default function CartPage() {
                                 {/* Remove Button - Larger touch target on mobile */}
                                 <button
                                   className="p-2 sm:p-2 text-black hover:text-red-500 transition-colors touch-manipulation"
-                                  onClick={() => dispatch(removeProduct(product._id))}
+                                  onClick={() => dispatch(removeFromCart(item.productId._id))}
                                   aria-label="Remove product"
                                   type="button"
                                 >
@@ -163,10 +152,10 @@ export default function CartPage() {
                               {/* Price - Centered on mobile */}
                               <div className="text-center sm:text-right">
                                 <div className="text-lg sm:text-lg lg:text-xl font-semibold text-gray-900">
-                                  ₹{((product.price ?? 0) * (product.quantity ?? 0)).toLocaleString()}
+                                  ₹{((item.productId.price - (item.productId.price * (item.productId.discount / 100))) * item.quantity).toLocaleString()}
                                 </div>
                                 <div className="text-xs sm:text-sm text-gray-500">
-                                  ₹{(product.price ?? 0).toLocaleString()} each
+                                  ₹{(item.productId.price - (item.productId.price * (item.productId.discount / 100))).toLocaleString()} each
                                 </div>
                               </div>
                             </div>
@@ -239,20 +228,6 @@ export default function CartPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Recommended Products - Commented out but responsive ready */}
-                {/* <div className="bg-white shadow-lg mt-6 p-4 sm:p-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">You might also like</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100"></div>
-                      <div className="flex-1">
-                        <h4 className="text-sm sm:text-base font-medium text-gray-900">Similar Product</h4>
-                        <p className="text-xs sm:text-sm text-gray-600">₹1,299</p>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
           )}

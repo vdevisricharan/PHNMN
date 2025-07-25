@@ -7,7 +7,7 @@ const ReturnPolicyPage = () => {
     {
       step: 1,
       title: 'Contact Support',
-      description: 'Contact our support team at returns@phenomenon.com with your order number.'
+      description: 'Contact our support team at returns@phnmn.com with your order number.'
     },
     {
       step: 2,
@@ -102,8 +102,8 @@ const ReturnPolicyPage = () => {
                 </h2>
                 <p className="text-blue-800">
                   Please contact us at{' '}
-                  <a href="mailto:returns@phenomenon.com" className="text-blue-600 hover:text-blue-800">
-                    returns@phenomenon.com
+                  <a href="mailto:returns@phnmn.com" className="text-blue-600 hover:text-blue-800">
+                    returns@phnmn.com
                   </a>
                   {' '}for any questions or assistance.
                 </p>

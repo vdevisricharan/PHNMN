@@ -52,7 +52,7 @@ const FAQsPage = () => {
                 },
                 {
                     q: 'How can I contact customer support?',
-                    a: 'Email us at support@phenomenon.com or use our contact form.'
+                    a: 'Email us at support@phnmn.com or use our contact form.'
                 }
             ]
         }

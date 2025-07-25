@@ -4,7 +4,7 @@ import ReduxProvider from '../redux/Provider';
 import { Urbanist } from "next/font/google";
 
 export const metadata: Metadata = {
-  title: "Phenomenon",
+  title: "PHNMN",
   description: "This ain't what you want, Bitch I'm a fucking phenomenon.",
 };
 

@@ -1,74 +1,164 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { CartItem, Product } from '../types';
+import {
+  getCart as getCartApi,
+  addToCart as addToCartApi,
+  updateCartItem as updateCartItemApi,
+  removeFromCart as removeFromCartApi
+} from '../apiCalls';
 
-interface Product {
-  _id: string;
-  img: string;
-  title?: string;
-  desc?: string;
-  categories?: string[];
-  size?: string[];
-  color?: string[];
-  price?: number;
-  createdAt?: number;
-  quantity?: number;
-  selectedColor?: string;
-  selectedSize?: string;
+// Extended CartItem type for populated product data
+export interface CartItemPopulated extends Omit<CartItem, 'productId'> {
+  productId: Product;
 }
 
 interface CartState {
-  products: Product[];
+  items: CartItemPopulated[];
   quantity: number;
   total: number;
+  isFetching: boolean;
+  error: string | null;
 }
 
 const initialState: CartState = {
-  products: [],
+  items: [],
   quantity: 0,
   total: 0,
+  isFetching: false,
+  error: null,
 };
 
+// Helper function for calculating cart totals
+const calculateCartTotals = (items: CartItemPopulated[]) => {
+  return {
+    quantity: items.reduce((acc: number, item: CartItemPopulated) => acc + item.quantity, 0),
+    total: items.reduce((acc: number, item: CartItemPopulated) => {
+      const price = item.productId.price * (1 - item.productId.discount / 100);
+      return acc + price * item.quantity;
+    }, 0),
+  };
+};
+
+// Async Thunks
+export const fetchCart = createAsyncThunk(
+  'cart/fetch',
+  async () => {
+    const response = await getCartApi();
+    return response as CartItemPopulated[];
+  }
+);
+
+export const addToCart = createAsyncThunk(
+  'cart/add',
+  async (data: { productId: string; size: string; color: string; quantity: number }) => {
+    const response = await addToCartApi(data);
+    return response as CartItemPopulated[];
+  }
+);
+
+export const updateCartItem = createAsyncThunk(
+  'cart/update',
+  async ({ productId, quantity }: { productId: string; quantity: number }) => {
+    const response = await updateCartItemApi(productId, { quantity });
+    return response as CartItemPopulated[];
+  }
+);
+
+export const removeFromCart = createAsyncThunk(
+  'cart/remove',
+  async (productId: string) => {
+    await removeFromCartApi(productId);
+    return productId;
+  }
+);
+
 const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState,
   reducers: {
-    addProduct: (state, action: PayloadAction<Product>) => {
-      state.quantity += 1;
-      state.products.push(action.payload);
-      state.total += (action.payload.price || 0) * (action.payload.quantity || 1);
+    clearError: (state) => {
+      state.error = null;
     },
-    increaseQuantity: (state, action: PayloadAction<string>) => {
-      const product = state.products.find(p => p._id === action.payload);
-      if (product) {
-        product.quantity = (product.quantity || 1) + 1;
-        state.total += product.price || 0;
-      }
+    clearCart: (state) => {
+      state.items = [];
+      state.quantity = 0;
+      state.total = 0;
     },
-    decreaseQuantity: (state, action: PayloadAction<string>) => {
-      const index = state.products.findIndex(p => p._id === action.payload);
-      if (index !== -1) {
-        const product = state.products[index];
-        if ((product.quantity || 1) > 1) {
-          product.quantity = (product.quantity || 1) - 1;
-          state.total -= product.price || 0;
-        } else {
-          // Remove product from cart
-          state.total -= (product.price || 0) * (product.quantity || 1);
-          state.products.splice(index, 1);
-          state.quantity -= 1;
-        }
-      }
-    },
-    removeProduct: (state, action: PayloadAction<string>) => {
-      const index = state.products.findIndex(p => p._id === action.payload);
-      if (index !== -1) {
-        const product = state.products[index];
-        state.total -= (product.price || 0) * (product.quantity || 1);
-        state.products.splice(index, 1);
-        state.quantity -= 1;
-      }
-    },
+  },
+  extraReducers: (builder) => {
+    // Fetch Cart
+    builder.addCase(fetchCart.pending, (state) => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(fetchCart.fulfilled, (state, action) => {
+      state.isFetching = false;
+      state.items = action.payload;
+      const totals = calculateCartTotals(action.payload);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+      state.error = null;
+    });
+    builder.addCase(fetchCart.rejected, (state, action) => {
+      state.isFetching = false;
+      state.error = action.error.message || 'Failed to fetch cart';
+    });
+
+    // Add to Cart
+    builder.addCase(addToCart.pending, (state) => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(addToCart.fulfilled, (state, action) => {
+      state.isFetching = false;
+      state.items = action.payload;
+      const totals = calculateCartTotals(action.payload);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+      state.error = null;
+    });
+    builder.addCase(addToCart.rejected, (state, action) => {
+      state.isFetching = false;
+      state.error = action.error.message || 'Failed to add item to cart';
+    });
+
+    // Update Cart Item
+    builder.addCase(updateCartItem.pending, (state) => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(updateCartItem.fulfilled, (state, action) => {
+      state.isFetching = false;
+      state.items = action.payload;
+      const totals = calculateCartTotals(action.payload);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+      state.error = null;
+    });
+    builder.addCase(updateCartItem.rejected, (state, action) => {
+      state.isFetching = false;
+      state.error = action.error.message || 'Failed to update cart item';
+    });
+
+    // Remove from Cart
+    builder.addCase(removeFromCart.pending, (state) => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(removeFromCart.fulfilled, (state, action) => {
+      state.isFetching = false;
+      state.items = state.items.filter(item => item.productId._id !== action.payload);
+      const totals = calculateCartTotals(state.items);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+      state.error = null;
+    });
+    builder.addCase(removeFromCart.rejected, (state, action) => {
+      state.isFetching = false;
+      state.error = action.error.message || 'Failed to remove item from cart';
+    });
   },
 });
 
-export const { addProduct, increaseQuantity, decreaseQuantity, removeProduct } = cartSlice.actions;
+export const { clearError, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -22,7 +22,7 @@ const Footer = () => (
                 <div className="space-y-4 md:space-y-6">
                     <Link href="/">
                         <span className="text-2xl lg:text-3xl font-bold cursor-pointer text-white hover:text-gray-300 transition-colors">
-                            PHENOMENON
+                            PHNMN
                         </span>
                     </Link>
                     <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
@@ -87,8 +87,8 @@ const Footer = () => (
                             <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 mr-3">
                                 <MailOutline fontSize="small" />
                             </div>
-                            <a href="mailto:hey@phenomenonfashion.in" className="text-sm sm:text-base hover:text-white transition-colors">
-                                hey@phenomenonfashion.in
+                            <a href="mailto:hey@phnmnfashion.in" className="text-sm sm:text-base hover:text-white transition-colors">
+                                hey@phnmnfashion.in
                             </a>
                         </div>
                         <div className="flex items-center">
@@ -105,7 +105,7 @@ const Footer = () => (
             {/* Copyright Section */}
             <div className="border-t border-gray-800 mt-8 lg:mt-12 pt-6 lg:pt-8 text-center">
                 <p className="text-xs sm:text-sm text-gray-400">
-                    © 2025 Phenomenon Fashion. All rights reserved.
+                    © 2025 PHNMN Fashion. All rights reserved.
                 </p>
             </div>
         </div>

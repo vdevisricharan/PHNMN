@@ -45,7 +45,7 @@ const PrivacyPolicyPage = () => {
             <div className="prose prose-lg max-w-none">
               <div className="bg-blue-50  p-6 mb-8">
                 <p className="text-blue-800">
-                  At Phenomenon, we value your privacy and are committed to protecting your personal information. 
+                  At PHNMN, we value your privacy and are committed to protecting your personal information. 
                   This policy explains how we collect, use, and safeguard your data.
                 </p>
               </div>
@@ -84,8 +84,8 @@ const PrivacyPolicyPage = () => {
                 </h2>
                 <p className="text-blue-800">
                   If you have any questions about this policy, please contact us at{' '}
-                  <a href="mailto:privacy@phenomenon.com" className="text-blue-600 hover:text-blue-800">
-                    privacy@phenomenon.com
+                  <a href="mailto:privacy@phnmn.com" className="text-blue-600 hover:text-blue-800">
+                    privacy@phnmn.com
                   </a>
                 </p>
               </div>

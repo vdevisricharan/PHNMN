@@ -31,7 +31,7 @@ app.use('/api/payments', require('./routes/payment'));
 app.use('/api/webhook', require('./routes/webhook'));
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Phenomenon API is running." });
+  res.status(200).json({ message: "PHNMN API is running." });
 });
 
 

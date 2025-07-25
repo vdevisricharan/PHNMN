@@ -14,7 +14,7 @@ const TermsConditionsPage = () => {
     {
       title: "Intellectual Property",
       content: [
-        "All content on this site, including text, images, and logos, is the property of Phenomenon and may not be used without permission."
+        "All content on this site, including text, images, and logos, is the property of PHNMN and may not be used without permission."
       ]
     },
     {
@@ -27,7 +27,7 @@ const TermsConditionsPage = () => {
     {
       title: "Limitation of Liability",
       content: [
-        "Phenomenon is not liable for any damages arising from the use of this site or products purchased through it."
+        "PHNMN is not liable for any damages arising from the use of this site or products purchased through it."
       ]
     },
     {
@@ -53,7 +53,7 @@ const TermsConditionsPage = () => {
             <div className="prose prose-lg max-w-none">
               <div className="bg-yellow-50 p-6  mb-8">
                 <p className="text-yellow-900">
-                  By using the Phenomenon website, you agree to the following terms and conditions. 
+                  By using the PHNMN website, you agree to the following terms and conditions. 
                   Please read them carefully.
                 </p>
               </div>
@@ -89,8 +89,8 @@ const TermsConditionsPage = () => {
                 </h2>
                 <p className="text-gray-600">
                   For questions about these terms, please contact us at{' '}
-                  <a href="mailto:support@phenomenon.com" className="text-blue-600 hover:text-blue-800">
-                    support@phenomenon.com
+                  <a href="mailto:support@phnmn.com" className="text-blue-600 hover:text-blue-800">
+                    support@phnmn.com
                   </a>
                 </p>
               </div>
