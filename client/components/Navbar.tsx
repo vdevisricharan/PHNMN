@@ -16,10 +16,10 @@ import {
   StarsOutlined
 } from "@mui/icons-material";
 import Badge from "@mui/material/Badge";
-import { useSelector} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
-import { RootState } from '../redux/store';
-import { logout } from "../redux/apiCalls";
+import { RootState, AppDispatch } from '../redux/store';
+import { logout as logoutAction } from "../redux/slices/userSlice";
 import { useRouter } from "next/navigation";
 
 const Navbar = () => {
@@ -32,9 +32,13 @@ const Navbar = () => {
   const quantity = useSelector((state: RootState) => state.cart.quantity);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Force re-render when user state changes
+  const userKey = currentUser ? currentUser._id : 'anonymous';
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutAction());
     router.push("/");
     setIsMenuOpen(false);
     setIsProfileModalOpen(false);
@@ -267,7 +271,7 @@ const Navbar = () => {
                 </div>
               </Link>
 
-              <Link href="/orders" onClick={closeProfileModal}>
+              <Link href="/profile/orders" onClick={closeProfileModal}>
                 <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
                   <ListAltOutlined className="text-gray-600" style={{ fontSize: 18 }} />
                   <span className="text-sm text-gray-700">My Orders</span>
@@ -397,7 +401,7 @@ const Navbar = () => {
                     </div>
                   </Link>
 
-                  <Link href="/orders" onClick={closeMenu}>
+                  <Link href="/profile/orders" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <ListAltOutlined className="text-gray-600" />
                       <span className="text-base text-gray-700">Orders</span>

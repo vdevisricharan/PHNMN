@@ -11,26 +11,23 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { fetchProfile } from '@/redux/slices/userSlice';
-import { fetchWalletBalance } from '@/redux/slices/walletSlice';
-import { fetchPointsBalance } from '@/redux/slices/pointsSlice';
 import { fetchOrders } from '@/redux/slices/orderSlice';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { currentUser, isFetching: userFetching } = useSelector((state: RootState) => state.user);
-  const { balance: walletBalance, isFetching: walletFetching } = useSelector((state: RootState) => state.wallet);
-  const { balance: pointsBalance, isFetching: pointsFetching } = useSelector((state: RootState) => state.points);
-  const { orders, isFetching: ordersFetching } = useSelector((state: RootState) => state.order);
+  const { currentUser, isFetching: userFetching, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { balance: walletBalance = 0, isFetching: walletFetching } = useSelector((state: RootState) => state.wallet || {});
+  const { balance: pointsBalance = 0, isFetching: pointsFetching } = useSelector((state: RootState) => state.points || {});
+  const { orders = [], isFetching: ordersFetching, hasInitialized: ordersInitialized } = useSelector((state: RootState) => state.order || {});
 
   useEffect(() => {
-    dispatch(fetchProfile());
-    dispatch(fetchWalletBalance());
-    dispatch(fetchPointsBalance());
-    dispatch(fetchOrders({ page: 1, limit: 5 })); // Fetch only 5 recent orders
-  }, [dispatch]);
+    // Only fetch orders if user is authenticated and orders not already initialized and not currently fetching
+    if (isAuthenticated && !ordersInitialized && !ordersFetching) {
+      dispatch(fetchOrders({ page: 1, limit: 5 })); // Fetch only 5 recent orders
+    }
+  }, [dispatch, isAuthenticated, ordersInitialized, ordersFetching]);
 
   if (!currentUser || userFetching) {
     return (
@@ -144,7 +141,7 @@ const ProfilePage = () => {
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">Recent Orders</h2>
               <Link
-                href="/orders"
+                href="/profile/orders"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
               >
                 View All Orders
@@ -155,7 +152,7 @@ const ProfilePage = () => {
                 <div className="p-6 text-center">
                   <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-900 mx-auto"></div>
                 </div>
-              ) : orders.length > 0 ? (
+              ) : Array.isArray(orders) && orders.length > 0 ? (
                 orders.slice(0, 3).map((order) => (
                   <div key={order._id} className="p-6 hover:bg-gray-50">
                     <div className="flex items-center justify-between mb-3">
@@ -182,7 +179,7 @@ const ProfilePage = () => {
                     <div className="text-sm text-gray-600 mb-3">
                       {order.items.length} item(s) • {order.paymentMethod.toUpperCase()}
                     </div>
-                    <Link href={`/orders/${order._id}`}>
+                    <Link href={`/profile/orders/${order._id}`}>
                       <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
                         View Details →
                       </button>

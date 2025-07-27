@@ -21,13 +21,17 @@ import type { Order } from '@/redux/types';
 
 const OrdersPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { orders, isFetching, error, hasMore, currentPage } = useSelector((state: RootState) => state.order);
+  const { orders = [], isFetching, error, hasMore, currentPage, hasInitialized } = useSelector((state: RootState) => state.order);
+  const { isAuthenticated } = useSelector((state: RootState) => state.user);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchOrders({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    // Only fetch orders if authenticated and not already initialized and not currently fetching
+    if (isAuthenticated && !hasInitialized && !isFetching) {
+      dispatch(fetchOrders({ page: 1, limit: 10 }));
+    }
+  }, [dispatch, isAuthenticated, hasInitialized, isFetching]);
 
   const handleLoadMore = () => {
     if (!isFetching && hasMore) {
@@ -224,7 +228,7 @@ const OrdersPage = () => {
                 <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
                   <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
                     <div className="flex flex-wrap gap-3">
-                      <Link href={`/orders/${order._id}`}>
+                      <Link href={`/profile/orders/${order._id}`}>
                         <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 transition-colors text-sm font-medium">
                           <VisibilityOutlined style={{ fontSize: 16 }} />
                           View Details
@@ -232,7 +236,7 @@ const OrdersPage = () => {
                       </Link>
                       
                       {order.trackingNumber && (
-                        <Link href={`/orders/${order._id}`}>
+                        <Link href={`/profile/orders/${order._id}`}>
                           <button className="flex items-center gap-2 px-4 py-2 border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors text-sm font-medium">
                             <LocalShippingOutlined style={{ fontSize: 16 }} />
                             Track Order
@@ -254,7 +258,7 @@ const OrdersPage = () => {
                       )}
                       
                       {order.orderStatus === 'delivered' && (
-                        <Link href={`/orders/${order._id}?return=true`}>
+                        <Link href={`/profile/orders/${order._id}?return=true`}>
                           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 transition-colors text-sm font-medium">
                             <AssignmentReturnOutlined style={{ fontSize: 16 }} />
                             Return

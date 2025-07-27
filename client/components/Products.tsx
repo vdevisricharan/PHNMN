@@ -1,11 +1,11 @@
 
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchProducts, setFilters, setSort, clearFilters } from "@/redux/slices/productsSlice";
+import { setFilters, setSort, clearFilters } from "@/redux/slices/productsSlice";
 import { useRouter } from "next/navigation";
 import type { ProductFilters, ProductSort } from "@/redux/types";
 
@@ -34,20 +34,24 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
     error 
   } = useSelector((state: RootState) => state.products);
 
+  // Memoize the filters to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => {
+    return propFilters;
+  }, [
+    JSON.stringify(propFilters.colors || []),
+    JSON.stringify(propFilters.sizes || []),
+    propFilters.minPrice,
+    propFilters.maxPrice
+  ]);
+
+  // Memoize the sort value
+  const memoizedSort = useMemo(() => {
+    return propSort;
+  }, [propSort]);
+
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-
-  // Fetch products on mount
-  useEffect(() => {
-    if (!isHydrated) return;
-    
-    dispatch(fetchProducts({ 
-      category, 
-      page: 1, 
-      limit: category ? 50 : 12 // Load more for category pages
-    }));
-  }, [dispatch, category, isHydrated]);
 
   // Apply filters from props when they change
   useEffect(() => {
@@ -59,23 +63,27 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
       newFilters.category = [category];
     }
     
-    if (propFilters.colors && propFilters.colors.length > 0) {
-      newFilters.colors = propFilters.colors;
+    if (memoizedFilters.colors && memoizedFilters.colors.length > 0) {
+      newFilters.colors = memoizedFilters.colors;
     }
     
-    if (propFilters.sizes && propFilters.sizes.length > 0) {
-      newFilters.sizes = propFilters.sizes;
+    if (memoizedFilters.sizes && memoizedFilters.sizes.length > 0) {
+      newFilters.sizes = memoizedFilters.sizes;
     }
     
-    if (propFilters.minPrice !== undefined || propFilters.maxPrice !== undefined) {
+    if (memoizedFilters.minPrice !== undefined || memoizedFilters.maxPrice !== undefined) {
       newFilters.priceRange = {
-        min: propFilters.minPrice || 0,
-        max: propFilters.maxPrice || 999999
+        min: memoizedFilters.minPrice || 0,
+        max: memoizedFilters.maxPrice || 999999
       };
     }
 
-    dispatch(setFilters(newFilters));
-  }, [dispatch, category, propFilters, isHydrated]);
+    // Only dispatch if filters have actually changed
+    const filtersChanged = JSON.stringify(newFilters) !== JSON.stringify(reduxFilters);
+    if (filtersChanged) {
+      dispatch(setFilters(newFilters));
+    }
+  }, [dispatch, category, memoizedFilters, reduxFilters, isHydrated]);
 
   // Apply sort from props when it changes
   useEffect(() => {
@@ -83,7 +91,7 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
 
     let sortConfig: ProductSort;
     
-    switch (propSort) {
+    switch (memoizedSort) {
       case 'price-asc':
         sortConfig = { field: 'price', direction: 'asc' };
         break;
@@ -99,11 +107,15 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
         break;
     }
 
-    dispatch(setSort(sortConfig));
-  }, [dispatch, propSort, isHydrated]);
+    // Only dispatch if sort has actually changed
+    const sortChanged = JSON.stringify(sortConfig) !== JSON.stringify(reduxSort);
+    if (sortChanged) {
+      dispatch(setSort(sortConfig));
+    }
+  }, [dispatch, memoizedSort, reduxSort, isHydrated]);
 
-  // Show loading during hydration or initial fetch
-  if (!isHydrated || isFetching) {
+  // Show loading during hydration or when products are not yet loaded
+  if (!isHydrated || (products.length === 0 && isFetching)) {
     return (
       <div className="flex justify-center items-center py-12 sm:py-16 lg:py-20 min-h-[300px]">
         <div className="animate-spin h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 border-2 sm:border-3 border-b-gray-900 border-t-transparent border-l-transparent border-r-transparent"></div>
@@ -116,13 +128,7 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
       <div className="text-center py-12 sm:py-16 lg:py-20 px-4">
         <div className="max-w-md mx-auto">
           <p className="text-red-500 text-base sm:text-lg mb-4 sm:mb-6">{error}</p>
-          <button 
-            onClick={() => dispatch(fetchProducts({ category, page: 1, limit: category ? 50 : 12 }))} 
-            className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white hover:bg-gray-800 focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200 text-sm sm:text-base font-medium"
-            type="button"
-          >
-            Try Again
-          </button>
+          <p className="text-sm text-gray-600">Please refresh the page to try again.</p>
         </div>
       </div>
     );
@@ -196,7 +202,7 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
         </div>
         
         {/* Empty State */}
-        {displayProducts.length === 0 && (
+        {displayProducts.length === 0 && products.length > 0 && (
           <div className="text-center py-16 sm:py-20 lg:py-24">
             <div className="max-w-md mx-auto px-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 flex items-center justify-center mx-auto mb-4 sm:mb-6">

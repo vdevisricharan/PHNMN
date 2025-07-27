@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { fetchPointsBalance, fetchPointsTransactions, redeemPoints } from '@/redux/slices/pointsSlice';
+import { fetchPointsTransactions, redeemPoints } from '@/redux/slices/pointsSlice';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -19,17 +19,25 @@ const PointsPage = () => {
   const {
     balance,
     transactions,
-    rewards,
     isFetching,
     error,
     hasMore,
     currentPage
   } = useSelector((state: RootState) => state.points);
 
+  // Mock rewards data until rewards are implemented in the state
+  const rewards = [
+    { id: '1', title: '10% Off Next Purchase', description: 'Get 10% off your next order', points: 100 },
+    { id: '2', title: 'Free Shipping', description: 'Free shipping on your next order', points: 50 },
+    { id: '3', title: '₹200 Wallet Credit', description: 'Add ₹200 to your wallet', points: 200 },
+  ];
+
   useEffect(() => {
-    dispatch(fetchPointsBalance());
-    dispatch(fetchPointsTransactions({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    // Only fetch transactions if we don't have any yet and not currently fetching
+    if (transactions.length === 0 && !isFetching) {
+      dispatch(fetchPointsTransactions({ page: 1, limit: 10 }));
+    }
+  }, [dispatch, transactions.length, isFetching]);
 
   const handleLoadMore = () => {
     if (!isFetching && hasMore) {
@@ -67,11 +75,7 @@ const PointsPage = () => {
               <StarsOutlined className="mr-2" />
               <span className="text-lg">Available Points</span>
             </div>
-            {isFetching ? (
-              <div className="h-12 w-32 bg-yellow-500 animate-pulse mb-6"></div>
-            ) : (
-              <div className="text-4xl sm:text-5xl font-bold mb-6">{balance} pts</div>
-            )}
+            <div className="text-4xl sm:text-5xl font-bold mb-6">{balance} pts</div>
             <div className="text-sm opacity-90">
               Earn points on every purchase and redeem them for exclusive rewards!
             </div>

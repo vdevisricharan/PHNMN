@@ -34,13 +34,19 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsLoading(true);
 
     try {
       await dispatch(login({ email, password })).unwrap();
-      router.replace("/");
+      // Small delay to ensure Redux state is updated before redirect
+      setTimeout(() => {
+        router.replace("/");
+      }, 100);
     } catch (error) {
       const apiError = error as ApiError;
       setErrorMessage(apiError.response?.data?.error || apiError.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +62,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-4 shadow-xl sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -71,7 +77,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300  shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                   placeholder="Enter your email"
                 />
               </div>
@@ -90,14 +96,14 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300  shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                   placeholder="Enter your password"
                 />
               </div>
             </div>
 
             {errorMessage && (
-              <div className="rounded-md bg-red-50 p-4">
+              <div className=" bg-red-50 p-4">
                 <div className="flex">
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
@@ -112,13 +118,13 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isFetching}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ${
+                className={`w-full flex justify-center py-2 px-4 border border-transparent  shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ${
                   isFetching ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {isFetching ? (
                   <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin mr-2"></div>
                     Signing in...
                   </div>
                 ) : (
@@ -143,7 +149,7 @@ export default function LoginPage() {
             <div className="mt-6">
               <Link
                 href="/register"
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="w-full flex justify-center py-2 px-4 border border-gray-300  shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 Create an account
               </Link>

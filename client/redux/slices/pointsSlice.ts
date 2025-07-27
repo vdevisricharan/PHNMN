@@ -13,6 +13,7 @@ const initialState: PointsState = {
   error: null,
   currentPage: 1,
   hasMore: true,
+  hasInitialized: false,
 };
 
 // Async Thunks
@@ -62,6 +63,7 @@ const pointsSlice = createSlice({
     builder.addCase(fetchPointsBalance.fulfilled, (state, action) => {
       state.isFetching = false;
       state.balance = action.payload.points;
+      state.hasInitialized = true;
       state.error = null;
     });
     builder.addCase(fetchPointsBalance.rejected, (state, action) => {

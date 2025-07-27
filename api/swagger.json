@@ -3,55 +3,143 @@
   "info": {
     "title": "PHNMN E-Commerce API",
     "version": "1.0.0",
-    "description": "API documentation for user, product, order, and payment services."
+    "description": "Comprehensive API documentation for PHNMN e-commerce platform including user management, product catalog, order processing, payment handling, and webhook integrations.",
+    "contact": {
+      "name": "API Support",
+      "email": "support@phnmn.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
   },
   "servers": [
-    { "url": "http://localhost:5000/api" }
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Development server"
+    },
+    {
+      "url": "https://api.phnmn.com/api",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and registration endpoints"
+    },
+    {
+      "name": "User Profile",
+      "description": "User profile management endpoints"
+    },
+    {
+      "name": "Wallet",
+      "description": "User wallet and balance management"
+    },
+    {
+      "name": "Points",
+      "description": "Loyalty points system"
+    },
+    {
+      "name": "Wishlist",
+      "description": "User wishlist management"
+    },
+    {
+      "name": "Cart",
+      "description": "Shopping cart operations"
+    },
+    {
+      "name": "Addresses",
+      "description": "User address management"
+    },
+    {
+      "name": "Products",
+      "description": "Product catalog and management"
+    },
+    {
+      "name": "Orders",
+      "description": "Order placement and management"
+    },
+    {
+      "name": "Payments",
+      "description": "Payment processing"
+    },
+    {
+      "name": "Webhooks",
+      "description": "External service webhooks"
+    }
   ],
   "paths": {
     "/users/register": {
       "post": {
+        "tags": ["Authentication"],
         "summary": "Register a new user",
+        "description": "Create a new user account with email verification",
+        "operationId": "registerUser",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string" },
-                  "email": { "type": "string", "format": "email" },
-                  "password": { "type": "string", "minLength": 6 }
-                },
-                "required": ["name", "email", "password"]
+                "$ref": "#/components/schemas/UserRegistration"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Valid registration",
+                  "value": {
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "password": "SecurePass123!"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "User successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Validation error"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     },
     "/users/login": {
       "post": {
-        "summary": "Login user",
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate user and return JWT token",
+        "operationId": "loginUser",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string", "format": "email" },
-                  "password": { "type": "string" }
-                },
-                "required": ["email", "password"]
+                "$ref": "#/components/schemas/UserLogin"
+              },
+              "examples": {
+                "example1": {
+                  "summary": "Valid login",
+                  "value": {
+                    "email": "john.doe@example.com",
+                    "password": "SecurePass123!"
+                  }
+                }
               }
             }
           }
@@ -62,97 +150,484 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "token": { "type": "string" },
-                    "user": { "$ref": "#/components/schemas/User" }
-                  }
+                  "$ref": "#/components/schemas/AuthResponse"
                 }
               }
             }
           },
-          "401": { "description": "Invalid credentials" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
-    "/users/wishlist": {
+    "/users/profile": {
       "get": {
-        "summary": "Get user's wishlist",
-        "security": [{ "bearerAuth": [] }],
+        "tags": ["User Profile"],
+        "summary": "Get user profile",
+        "description": "Retrieve current user's profile information",
+        "operationId": "getUserProfile",
+        "security": [{"bearerAuth": []}],
         "responses": {
           "200": {
-            "description": "Wishlist retrieved",
+            "description": "Profile retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Product" }
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       },
-      "post": {
-        "summary": "Add item to wishlist",
-        "security": [{ "bearerAuth": [] }],
+      "put": {
+        "tags": ["User Profile"],
+        "summary": "Update user profile",
+        "description": "Update current user's profile information",
+        "operationId": "updateUserProfile",
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "productId": { "type": "string" }
-                },
-                "required": ["productId"]
+                "$ref": "#/components/schemas/UserProfileUpdate"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Item added to wishlist" }
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/profile/password": {
+      "put": {
+        "tags": ["User Profile"],
+        "summary": "Update user password",
+        "description": "Change current user's password",
+        "operationId": "updateUserPassword",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/wallet": {
+      "get": {
+        "tags": ["Wallet"],
+        "summary": "Get wallet details",
+        "description": "Retrieve user's wallet balance and details",
+        "operationId": "getWalletDetails",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Wallet details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/wallet/add": {
+      "post": {
+        "tags": ["Wallet"],
+        "summary": "Add money to wallet",
+        "description": "Add funds to user's wallet balance",
+        "operationId": "addWalletMoney",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWalletMoney"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Money added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/wallet/transactions": {
+      "get": {
+        "tags": ["Wallet"],
+        "summary": "Get wallet transactions",
+        "description": "Retrieve user's wallet transaction history",
+        "operationId": "getWalletTransactions",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer", "default": 1, "minimum": 1},
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 10, "minimum": 1, "maximum": 100},
+            "description": "Number of transactions per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet transactions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletTransactionsList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/points": {
+      "get": {
+        "tags": ["Points"],
+        "summary": "Get points details",
+        "description": "Retrieve user's loyalty points balance and details",
+        "operationId": "getPointsDetails",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Points details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/points/redeem": {
+      "post": {
+        "tags": ["Points"],
+        "summary": "Redeem loyalty points",
+        "description": "Redeem points for wallet credit or discounts",
+        "operationId": "redeemPoints",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemPoints"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Points redeemed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/points/transactions": {
+      "get": {
+        "tags": ["Points"],
+        "summary": "Get points transactions",
+        "description": "Retrieve user's points transaction history",
+        "operationId": "getPointsTransactions",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer", "default": 1, "minimum": 1},
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 10, "minimum": 1, "maximum": 100},
+            "description": "Number of transactions per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Points transactions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsTransactionsList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/wishlist": {
+      "get": {
+        "tags": ["Wishlist"],
+        "summary": "Get user's wishlist",
+        "description": "Retrieve all items in user's wishlist",
+        "operationId": "getWishlist",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Wishlist retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {"$ref": "#/components/schemas/WishlistItem"}
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Wishlist"],
+        "summary": "Add item to wishlist",
+        "description": "Add a product to user's wishlist",
+        "operationId": "addToWishlist",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToWishlist"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item added to wishlist successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/users/wishlist/{productId}": {
       "delete": {
+        "tags": ["Wishlist"],
         "summary": "Remove item from wishlist",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Remove a product from user's wishlist",
+        "operationId": "removeFromWishlist",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "productId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Product ID to remove from wishlist"
           }
         ],
         "responses": {
-          "200": { "description": "Item removed from wishlist" }
+          "200": {
+            "description": "Item removed from wishlist successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/users/cart": {
       "get": {
+        "tags": ["Cart"],
         "summary": "Get user's cart",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Retrieve all items in user's shopping cart",
+        "operationId": "getCart",
+        "security": [{"bearerAuth": []}],
         "responses": {
           "200": {
-            "description": "Cart retrieved",
+            "description": "Cart retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/CartItem" }
+                  "$ref": "#/components/schemas/CartResponse"
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       },
       "post": {
+        "tags": ["Cart"],
         "summary": "Add item to cart",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Add a product to user's shopping cart",
+        "operationId": "addToCart",
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
@@ -164,20 +639,45 @@
           }
         },
         "responses": {
-          "200": { "description": "Item added to cart" }
+          "200": {
+            "description": "Item added to cart successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/users/cart/{productId}": {
       "put": {
+        "tags": ["Cart"],
         "summary": "Update cart item",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Update quantity, size, or color of an item in cart",
+        "operationId": "updateCartItem",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "productId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Product ID to update in cart"
           }
         ],
         "requestBody": {
@@ -185,82 +685,154 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "quantity": { "type": "number" },
-                  "size": { "type": "string" },
-                  "color": { "type": "string" }
-                }
+                "$ref": "#/components/schemas/UpdateCartItem"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Cart item updated" }
+          "200": {
+            "description": "Cart item updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       },
       "delete": {
+        "tags": ["Cart"],
         "summary": "Remove item from cart",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Remove a product from user's shopping cart",
+        "operationId": "removeFromCart",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "productId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Product ID to remove from cart"
           }
         ],
         "responses": {
-          "200": { "description": "Item removed from cart" }
+          "200": {
+            "description": "Item removed from cart successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/users/addresses": {
       "get": {
+        "tags": ["Addresses"],
         "summary": "Get user's addresses",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Retrieve all saved addresses for the user",
+        "operationId": "getAddresses",
+        "security": [{"bearerAuth": []}],
         "responses": {
           "200": {
-            "description": "Addresses retrieved",
+            "description": "Addresses retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/Address" }
+                  "items": {"$ref": "#/components/schemas/Address"}
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       },
       "post": {
+        "tags": ["Addresses"],
         "summary": "Add new address",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Add a new delivery address for the user",
+        "operationId": "addAddress",
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Address"
+                "$ref": "#/components/schemas/AddressInput"
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Address added" }
+          "201": {
+            "description": "Address added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Address"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/users/addresses/{addressId}": {
       "put": {
+        "tags": ["Addresses"],
         "summary": "Update address",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Update an existing address",
+        "operationId": "updateAddress",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "addressId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Address ID to update"
           }
         ],
         "requestBody": {
@@ -268,169 +840,659 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Address"
+                "$ref": "#/components/schemas/AddressInput"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Address updated" }
+          "200": {
+            "description": "Address updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Address"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       },
       "delete": {
+        "tags": ["Addresses"],
         "summary": "Delete address",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Delete an existing address",
+        "operationId": "deleteAddress",
+        "security": [{"bearerAuth": []}],
         "parameters": [
           {
             "name": "addressId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Address ID to delete"
           }
         ],
         "responses": {
-          "200": { "description": "Address deleted" }
+          "200": {
+            "description": "Address deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/addresses/{addressId}/default": {
+      "put": {
+        "tags": ["Addresses"],
+        "summary": "Set default address",
+        "description": "Set an address as the default delivery address",
+        "operationId": "setDefaultAddress",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Address ID to set as default"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default address updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Address"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/products": {
       "get": {
+        "tags": ["Products"],
         "summary": "Get all products",
+        "description": "Retrieve products with filtering, sorting, and pagination",
+        "operationId": "getAllProducts",
         "parameters": [
           {
             "name": "category",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Filter by category"
           },
           {
             "name": "brand",
             "in": "query",
-            "schema": { "type": "string" }
+            "schema": {"type": "string"},
+            "description": "Filter by brand"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "schema": {"type": "number", "minimum": 0},
+            "description": "Minimum price filter"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "schema": {"type": "number", "minimum": 0},
+            "description": "Maximum price filter"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Search term for product name or description"
           },
           {
             "name": "sort",
             "in": "query",
-            "schema": { "type": "string", "enum": ["price_asc", "price_desc", "newest"] }
+            "schema": {
+              "type": "string",
+              "enum": ["price_asc", "price_desc", "newest", "oldest", "rating", "name_asc", "name_desc"]
+            },
+            "description": "Sort products by specified criteria"
           },
           {
             "name": "page",
             "in": "query",
-            "schema": { "type": "integer", "default": 1 }
+            "schema": {"type": "integer", "default": 1, "minimum": 1},
+            "description": "Page number for pagination"
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": { "type": "integer", "default": 10 }
+            "schema": {"type": "integer", "default": 10, "minimum": 1, "maximum": 100},
+            "description": "Number of products per page"
+          },
+          {
+            "name": "featured",
+            "in": "query",
+            "schema": {"type": "boolean"},
+            "description": "Filter for featured products only"
           }
         ],
         "responses": {
-          "200": { 
-            "description": "List of products",
+          "200": {
+            "description": "Products retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "products": {
-                      "type": "array",
-                      "items": { "$ref": "#/components/schemas/Product" }
-                    },
-                    "total": { "type": "integer" },
-                    "page": { "type": "integer" },
-                    "pages": { "type": "integer" }
-                  }
+                  "$ref": "#/components/schemas/ProductsList"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       },
       "post": {
+        "tags": ["Products"],
         "summary": "Create a product",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Create a new product (Admin only)",
+        "operationId": "createProduct",
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Product"
+                "$ref": "#/components/schemas/ProductInput"
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Product created" }
+          "201": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by ID",
+        "description": "Retrieve detailed information about a specific product",
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "summary": "Update product",
+        "description": "Update an existing product (Admin only)",
+        "operationId": "updateProduct",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Product ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete product",
+        "description": "Delete an existing product (Admin only)",
+        "operationId": "deleteProduct",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
     "/orders": {
       "post": {
+        "tags": ["Orders"],
         "summary": "Place a new order",
-        "security": [{ "bearerAuth": [] }],
+        "description": "Create a new order with selected items",
+        "operationId": "placeOrder",
+        "security": [{"bearerAuth": []}],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Order"
+                "$ref": "#/components/schemas/OrderInput"
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Order placed" }
+          "201": {
+            "description": "Order placed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get user orders",
+        "description": "Retrieve all orders for the authenticated user",
+        "operationId": "getUserOrders",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"]
+            },
+            "description": "Filter orders by status"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer", "default": 1, "minimum": 1},
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 10, "minimum": 1, "maximum": 100},
+            "description": "Number of orders per page"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["createdAt", "totalAmount", "status"],
+              "default": "createdAt"
+            },
+            "description": "Field to sort by"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "description": "Sort order"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrdersList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     },
-    "/payments/create-intent": {
-      "post": {
-        "summary": "Create a Stripe payment intent",
-        "security": [{ "bearerAuth": [] }],
+    "/orders/{id}": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Get order by ID",
+        "description": "Retrieve detailed information about a specific order",
+        "operationId": "getOrderById",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/orders/{id}/cancel": {
+      "put": {
+        "tags": ["Orders"],
+        "summary": "Cancel order",
+        "description": "Cancel an existing order if it's eligible for cancellation",
+        "operationId": "cancelOrder",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Order ID"
+          }
+        ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "amount": { "type": "number" },
-                  "currency": { "type": "string", "default": "usd" }
-                },
-                "required": ["amount"]
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for cancellation"
+                  }
+                }
               }
             }
           }
         },
         "responses": {
-          "200": { 
-            "description": "Client secret returned",
+          "200": {
+            "description": "Order cancelled successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "clientSecret": { "type": "string" }
-                  }
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/payments/create-intent": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create payment intent",
+        "description": "Create a Stripe payment intent for processing payment",
+        "operationId": "createPaymentIntent",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentIntentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment intent created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     },
     "/webhook": {
       "post": {
+        "tags": ["Webhooks"],
         "summary": "Stripe webhook endpoint",
+        "description": "Handle Stripe webhook events for payment processing",
+        "operationId": "handleStripeWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Stripe webhook signature for verification"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "type": "object" }
+              "schema": {
+                "$ref": "#/components/schemas/StripeWebhookEvent"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "Webhook received" }
+          "200": {
+            "description": "Webhook processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
       }
     }
@@ -440,132 +1502,735 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "description": "JWT token for authentication. Format: Bearer {token}"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request - Invalid input data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "validation": {
+                "summary": "Validation error",
+                "value": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "errors": [
+                    {"field": "email", "message": "Invalid email format"},
+                    {"field": "password", "message": "Password must be at least 6 characters"}
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized - Invalid or missing authentication",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "missingToken": {
+                "summary": "Missing token",
+                "value": {
+                  "success": false,
+                  "message": "Access token is required"
+                }
+              },
+              "invalidToken": {
+                "summary": "Invalid token",
+                "value": {
+                  "success": false,
+                  "message": "Invalid or expired token"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden - Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "adminRequired": {
+                "summary": "Admin access required",
+                "value": {
+                  "success": false,
+                  "message": "Admin access required for this operation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "productNotFound": {
+                "summary": "Product not found",
+                "value": {
+                  "success": false,
+                  "message": "Product not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Resource conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "emailExists": {
+                "summary": "Email already exists",
+                "value": {
+                  "success": false,
+                  "message": "Email already exists"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "serverError": {
+                "summary": "Server error",
+                "value": {
+                  "success": false,
+                  "message": "Internal server error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean", "example": false},
+          "message": {"type": "string"},
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {"type": "string"},
+                "message": {"type": "string"}
+              }
+            }
+          },
+          "timestamp": {"type": "string", "format": "date-time"},
+          "path": {"type": "string"}
+        },
+        "required": ["success", "message"]
+      },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean", "example": true},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "message"]
+      },
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "minLength": 2, "maxLength": 50, "example": "John Doe"},
+          "email": {"type": "string", "format": "email", "example": "john.doe@example.com"},
+          "password": {"type": "string", "minLength": 6, "maxLength": 100, "example": "SecurePass123!"},
+          "phone": {"type": "string", "pattern": "^[+]?[1-9]\\d{1,14}$", "example": "+1234567890"}
+        },
+        "required": ["name", "email", "password"]
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "email": {"type": "string", "format": "email", "example": "john.doe@example.com"},
+          "password": {"type": "string", "example": "SecurePass123!"}
+        },
+        "required": ["email", "password"]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean", "example": true},
+          "message": {"type": "string"},
+          "token": {"type": "string", "description": "JWT authentication token"},
+          "user": {"$ref": "#/components/schemas/User"}
+        },
+        "required": ["success", "token", "user"]
+      },
       "User": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "phone": { "type": "string" },
-          "isAdmin": { "type": "boolean" },
-          "cart": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/CartItem" }
-          },
-          "wishlist": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/WishlistItem" }
-          },
-          "addresses": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/Address" }
-          },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+          "id": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+          "name": {"type": "string", "example": "John Doe"},
+          "email": {"type": "string", "format": "email", "example": "john.doe@example.com"},
+          "phone": {"type": "string", "example": "+1234567890"},
+          "isAdmin": {"type": "boolean", "example": false},
+          "isVerified": {"type": "boolean", "example": true},
+          "avatar": {"type": "string", "format": "uri"},
+          "dateOfBirth": {"type": "string", "format": "date"},
+          "gender": {"type": "string", "enum": ["male", "female", "other"]},
+          "walletBalance": {"type": "number", "example": 150.75},
+          "pointsBalance": {"type": "number", "example": 1250},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
+        },
+        "required": ["id", "name", "email", "isAdmin"]
+      },
+      "UserProfileUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "minLength": 2, "maxLength": 50},
+          "phone": {"type": "string", "pattern": "^[+]?[1-9]\\d{1,14}$"},
+          "dateOfBirth": {"type": "string", "format": "date"},
+          "gender": {"type": "string", "enum": ["male", "female", "other"]},
+          "avatar": {"type": "string", "format": "uri"}
         }
       },
-      "Product": {
+      "PasswordUpdate": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "brand": { "type": "string" },
-          "category": { "type": "string" },
-          "images": { 
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "price": { "type": "number" },
-          "discount": { "type": "number" },
-          "sizes": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "colors": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "stock": {
-            "type": "object",
-            "additionalProperties": { "type": "number" }
-          },
-          "tags": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "rating": { "type": "number" },
-          "reviewsCount": { "type": "number" },
-          "isFeatured": { "type": "boolean" },
-          "createdAt": { "type": "string", "format": "date-time" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+          "currentPassword": {"type": "string"},
+          "newPassword": {"type": "string", "minLength": 6, "maxLength": 100}
         },
-        "required": ["name", "price", "category"]
+        "required": ["currentPassword", "newPassword"]
       },
-      "CartItem": {
+      "WalletDetails": {
         "type": "object",
         "properties": {
-          "productId": { "type": "string" },
-          "size": { "type": "string" },
-          "color": { "type": "string" },
-          "quantity": { "type": "number", "default": 1 },
-          "addedAt": { "type": "string", "format": "date-time" }
+          "balance": {"type": "number", "example": 150.75},
+          "currency": {"type": "string", "example": "USD"},
+          "lastTransaction": {"$ref": "#/components/schemas/WalletTransaction"}
+        },
+        "required": ["balance", "currency"]
+      },
+      "AddWalletMoney": {
+        "type": "object",
+        "properties": {
+          "amount": {"type": "number", "minimum": 1, "example": 50.00},
+          "paymentMethod": {"type": "string", "enum": ["card", "bank_transfer", "points_redemption"]},
+          "description": {"type": "string", "example": "Wallet top-up"}
+        },
+        "required": ["amount", "paymentMethod"]
+      },
+      "WalletTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"type": "string", "enum": ["credit", "debit"]},
+          "amount": {"type": "number"},
+          "description": {"type": "string"},
+          "balanceAfter": {"type": "number"},
+          "reference": {"type": "string"},
+          "createdAt": {"type": "string", "format": "date-time"}
+        },
+        "required": ["id", "type", "amount", "description", "balanceAfter", "createdAt"]
+      },
+      "WalletTransactionsList": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/WalletTransaction"}
+          },
+          "pagination": {"$ref": "#/components/schemas/PaginationInfo"}
+        },
+        "required": ["transactions", "pagination"]
+      },
+      "PointsDetails": {
+        "type": "object",
+        "properties": {
+          "balance": {"type": "number", "example": 1250},
+          "tier": {"type": "string", "enum": ["bronze", "silver", "gold", "platinum"], "example": "silver"},
+          "nextTierPoints": {"type": "number", "example": 750},
+          "expiringPoints": {"type": "number", "example": 100},
+          "expiryDate": {"type": "string", "format": "date"}
+        },
+        "required": ["balance", "tier"]
+      },
+      "RedeemPoints": {
+        "type": "object",
+        "properties": {
+          "points": {"type": "number", "minimum": 100, "example": 500},
+          "redeemType": {"type": "string", "enum": ["wallet_credit", "discount_coupon"]},
+          "description": {"type": "string"}
+        },
+        "required": ["points", "redeemType"]
+      },
+      "PointsTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"type": "string", "enum": ["earned", "redeemed", "expired"]},
+          "points": {"type": "number"},
+          "description": {"type": "string"},
+          "balanceAfter": {"type": "number"},
+          "reference": {"type": "string"},
+          "createdAt": {"type": "string", "format": "date-time"}
+        },
+        "required": ["id", "type", "points", "description", "balanceAfter", "createdAt"]
+      },
+      "PointsTransactionsList": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/PointsTransaction"}
+          },
+          "pagination": {"$ref": "#/components/schemas/PaginationInfo"}
+        },
+        "required": ["transactions", "pagination"]
+      },
+      "AddToWishlist": {
+        "type": "object",
+        "properties": {
+          "productId": {"type": "string", "example": "507f1f77bcf86cd799439011"}
         },
         "required": ["productId"]
       },
       "WishlistItem": {
         "type": "object",
         "properties": {
-          "productId": { "type": "string" },
-          "addedAt": { "type": "string", "format": "date-time" }
+          "productId": {"type": "string"},
+          "product": {"$ref": "#/components/schemas/Product"},
+          "addedAt": {"type": "string", "format": "date-time"}
         },
-        "required": ["productId"]
+        "required": ["productId", "addedAt"]
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+          "productId": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+          "size": {"type": "string", "example": "M"},
+          "color": {"type": "string", "example": "Blue"},
+          "quantity": {"type": "number", "minimum": 1, "example": 2}
+        },
+        "required": ["productId", "quantity"]
+      },
+      "UpdateCartItem": {
+        "type": "object",
+        "properties": {
+          "size": {"type": "string"},
+          "color": {"type": "string"},
+          "quantity": {"type": "number", "minimum": 1}
+        }
+      },
+      "CartResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {"$ref": "#/components/schemas/CartItem"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "product": {"$ref": "#/components/schemas/Product"},
+                    "subtotal": {"type": "number"},
+                    "addedAt": {"type": "string", "format": "date-time"}
+                  }
+                }
+              ]
+            }
+          },
+          "totalItems": {"type": "number"},
+          "totalAmount": {"type": "number"},
+          "currency": {"type": "string", "example": "USD"}
+        },
+        "required": ["items", "totalItems", "totalAmount", "currency"]
+      },
+      "AddressInput": {
+        "type": "object",
+        "properties": {
+          "label": {"type": "string", "example": "Home"},
+          "fullName": {"type": "string", "example": "John Doe"},
+          "phone": {"type": "string", "example": "+1234567890"},
+          "street": {"type": "string", "example": "123 Main Street"},
+          "apartment": {"type": "string", "example": "Apt 4B"},
+          "city": {"type": "string", "example": "New York"},
+          "state": {"type": "string", "example": "NY"},
+          "postalCode": {"type": "string", "example": "10001"},
+          "country": {"type": "string", "example": "United States"},
+          "isDefault": {"type": "boolean", "example": false}
+        },
+        "required": ["fullName", "phone", "street", "city", "state", "postalCode", "country"]
       },
       "Address": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "label": { "type": "string" },
-          "fullName": { "type": "string" },
-          "phone": { "type": "string" },
-          "street": { "type": "string" },
-          "city": { "type": "string" },
-          "state": { "type": "string" },
-          "postalCode": { "type": "string" },
-          "country": { "type": "string" },
-          "isDefault": { "type": "boolean" },
-          "createdAt": { "type": "string", "format": "date-time" }
-        },
-        "required": ["fullName", "street", "city", "postalCode", "country"]
+        "allOf": [
+          {"$ref": "#/components/schemas/AddressInput"},
+          {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+              "createdAt": {"type": "string", "format": "date-time"},
+              "updatedAt": {"type": "string", "format": "date-time"}
+            },
+            "required": ["id", "createdAt"]
+          }
+        ]
       },
-      "Order": {
+      "ProductInput": {
         "type": "object",
         "properties": {
-          "userId": { "type": "string" },
+          "name": {"type": "string", "example": "Premium Cotton T-Shirt"},
+          "description": {"type": "string", "example": "High-quality cotton t-shirt with premium fabric"},
+          "brand": {"type": "string", "example": "PHNMN"},
+          "category": {"type": "string", "example": "Clothing"},
+          "subcategory": {"type": "string", "example": "T-Shirts"},
+          "images": {
+            "type": "array",
+            "items": {"type": "string", "format": "uri"},
+            "minItems": 1
+          },
+          "price": {"type": "number", "minimum": 0, "example": 29.99},
+          "compareAtPrice": {"type": "number", "minimum": 0, "example": 39.99},
+          "discount": {"type": "number", "minimum": 0, "maximum": 100, "example": 25},
+          "sizes": {
+            "type": "array",
+            "items": {"type": "string"},
+            "example": ["XS", "S", "M", "L", "XL"]
+          },
+          "colors": {
+            "type": "array",
+            "items": {"type": "string"},
+            "example": ["Black", "White", "Blue", "Red"]
+          },
+          "stock": {
+            "type": "object",
+            "additionalProperties": {"type": "number"},
+            "example": {"S-Black": 10, "M-White": 15}
+          },
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "example": ["casual", "cotton", "basic"]
+          },
+          "isFeatured": {"type": "boolean", "example": false},
+          "isActive": {"type": "boolean", "example": true},
+          "weight": {"type": "number", "example": 0.2},
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": {"type": "number"},
+              "width": {"type": "number"},
+              "height": {"type": "number"}
+            }
+          },
+          "seoTitle": {"type": "string"},
+          "seoDescription": {"type": "string"}
+        },
+        "required": ["name", "price", "category", "images"]
+      },
+      "Product": {
+        "allOf": [
+          {"$ref": "#/components/schemas/ProductInput"},
+          {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+              "sku": {"type": "string", "example": "PHNMN-TSH-001"},
+              "rating": {"type": "number", "minimum": 0, "maximum": 5, "example": 4.5},
+              "reviewsCount": {"type": "number", "example": 127},
+              "totalSold": {"type": "number", "example": 543},
+              "viewsCount": {"type": "number", "example": 2341},
+              "slug": {"type": "string", "example": "premium-cotton-t-shirt"},
+              "createdAt": {"type": "string", "format": "date-time"},
+              "updatedAt": {"type": "string", "format": "date-time"}
+            },
+            "required": ["id", "sku", "slug", "createdAt"]
+          }
+        ]
+      },
+      "ProductsList": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Product"}
+          },
+          "pagination": {"$ref": "#/components/schemas/PaginationInfo"},
+          "filters": {
+            "type": "object",
+            "properties": {
+              "categories": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "brands": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "priceRange": {
+                "type": "object",
+                "properties": {
+                  "min": {"type": "number"},
+                  "max": {"type": "number"}
+                }
+              }
+            }
+          }
+        },
+        "required": ["products", "pagination"]
+      },
+      "OrderInput": {
+        "type": "object",
+        "properties": {
           "items": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "productId": { "type": "string" },
-                "quantity": { "type": "number" },
-                "price": { "type": "number" },
-                "size": { "type": "string" },
-                "color": { "type": "string" }
+                "productId": {"type": "string"},
+                "quantity": {"type": "number", "minimum": 1},
+                "size": {"type": "string"},
+                "color": {"type": "string"},
+                "price": {"type": "number", "minimum": 0}
               },
               "required": ["productId", "quantity", "price"]
+            },
+            "minItems": 1
+          },
+          "shippingAddressId": {"type": "string"},
+          "billingAddressId": {"type": "string"},
+          "paymentMethod": {
+            "type": "string",
+            "enum": ["card", "wallet", "cod", "bank_transfer"]
+          },
+          "subtotal": {"type": "number", "minimum": 0},
+          "shippingCost": {"type": "number", "minimum": 0},
+          "taxAmount": {"type": "number", "minimum": 0},
+          "discountAmount": {"type": "number", "minimum": 0},
+          "totalAmount": {"type": "number", "minimum": 0},
+          "couponCode": {"type": "string"},
+          "notes": {"type": "string", "maxLength": 500},
+          "useWalletBalance": {"type": "boolean", "default": false},
+          "usePoints": {"type": "number", "minimum": 0}
+        },
+        "required": ["items", "shippingAddressId", "paymentMethod", "totalAmount"]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+          "orderNumber": {"type": "string", "example": "ORD-2024-001234"},
+          "userId": {"type": "string"},
+          "status": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"],
+            "example": "confirmed"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {"type": "string"},
+                "product": {"$ref": "#/components/schemas/Product"},
+                "quantity": {"type": "number"},
+                "size": {"type": "string"},
+                "color": {"type": "string"},
+                "price": {"type": "number"},
+                "subtotal": {"type": "number"}
+              },
+              "required": ["productId", "quantity", "price", "subtotal"]
             }
           },
-          "subtotal": { "type": "number" },
-          "totalAmount": { "type": "number" },
-          "addressSnapshot": { "$ref": "#/components/schemas/Address" }
+          "shippingAddress": {"$ref": "#/components/schemas/Address"},
+          "billingAddress": {"$ref": "#/components/schemas/Address"},
+          "paymentMethod": {"type": "string"},
+          "paymentStatus": {
+            "type": "string",
+            "enum": ["pending", "processing", "paid", "failed", "refunded"],
+            "example": "paid"
+          },
+          "subtotal": {"type": "number"},
+          "shippingCost": {"type": "number"},
+          "taxAmount": {"type": "number"},
+          "discountAmount": {"type": "number"},
+          "totalAmount": {"type": "number"},
+          "currency": {"type": "string", "default": "USD"},
+          "couponCode": {"type": "string"},
+          "notes": {"type": "string"},
+          "tracking": {
+            "type": "object",
+            "properties": {
+              "carrier": {"type": "string"},
+              "trackingNumber": {"type": "string"},
+              "trackingUrl": {"type": "string", "format": "uri"}
+            }
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {"type": "string"},
+                "timestamp": {"type": "string", "format": "date-time"},
+                "note": {"type": "string"}
+              }
+            }
+          },
+          "estimatedDelivery": {"type": "string", "format": "date"},
+          "deliveredAt": {"type": "string", "format": "date-time"},
+          "cancelledAt": {"type": "string", "format": "date-time"},
+          "cancellationReason": {"type": "string"},
+          "refundAmount": {"type": "number"},
+          "refundedAt": {"type": "string", "format": "date-time"},
+          "pointsEarned": {"type": "number"},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
         },
-        "required": ["userId", "items", "totalAmount", "addressSnapshot"]
+        "required": ["id", "orderNumber", "userId", "status", "items", "totalAmount", "currency", "createdAt"]
+      },
+      "OrdersList": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Order"}
+          },
+          "pagination": {"$ref": "#/components/schemas/PaginationInfo"},
+          "summary": {
+            "type": "object",
+            "properties": {
+              "totalOrders": {"type": "number"},
+              "totalSpent": {"type": "number"},
+              "averageOrderValue": {"type": "number"},
+              "statusCounts": {
+                "type": "object",
+                "additionalProperties": {"type": "number"}
+              }
+            }
+          }
+        },
+        "required": ["orders", "pagination"]
+      },
+      "PaymentIntentRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {"type": "number", "minimum": 0.5, "example": 99.99},
+          "currency": {"type": "string", "default": "usd", "example": "usd"},
+          "orderId": {"type": "string", "example": "507f1f77bcf86cd799439011"},
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {"type": "string"},
+            "example": {
+              "order_id": "507f1f77bcf86cd799439011",
+              "customer_id": "507f1f77bcf86cd799439012"
+            }
+          },
+          "paymentMethodTypes": {
+            "type": "array",
+            "items": {"type": "string"},
+            "default": ["card"],
+            "example": ["card", "us_bank_account"]
+          },
+          "setupFutureUsage": {
+            "type": "string",
+            "enum": ["on_session", "off_session"],
+            "example": "off_session"
+          }
+        },
+        "required": ["amount"]
+      },
+      "PaymentIntentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean", "example": true},
+          "clientSecret": {"type": "string", "description": "Client secret for confirming payment on frontend"},
+          "paymentIntentId": {"type": "string"},
+          "amount": {"type": "number"},
+          "currency": {"type": "string"},
+          "status": {"type": "string", "example": "requires_payment_method"}
+        },
+        "required": ["success", "clientSecret", "paymentIntentId"]
+      },
+      "StripeWebhookEvent": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "object": {"type": "string", "example": "event"},
+          "type": {
+            "type": "string",
+            "enum": [
+              "payment_intent.succeeded",
+              "payment_intent.payment_failed",
+              "payment_method.attached",
+              "customer.created",
+              "customer.updated",
+              "invoice.payment_succeeded",
+              "invoice.payment_failed"
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "object": {"type": "object"}
+            }
+          },
+          "created": {"type": "number"},
+          "livemode": {"type": "boolean"},
+          "pending_webhooks": {"type": "number"},
+          "request": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "idempotency_key": {"type": "string"}
+            }
+          }
+        },
+        "required": ["id", "type", "data"]
+      },
+      "PaginationInfo": {
+        "type": "object",
+        "properties": {
+          "currentPage": {"type": "integer", "minimum": 1, "example": 1},
+          "totalPages": {"type": "integer", "minimum": 1, "example": 10},
+          "totalItems": {"type": "integer", "minimum": 0, "example": 95},
+          "itemsPerPage": {"type": "integer", "minimum": 1, "example": 10},
+          "hasNextPage": {"type": "boolean", "example": true},
+          "hasPrevPage": {"type": "boolean", "example": false}
+        },
+        "required": ["currentPage", "totalPages", "totalItems", "itemsPerPage", "hasNextPage", "hasPrevPage"]
       }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }

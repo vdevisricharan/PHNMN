@@ -12,6 +12,7 @@ const initialState: ProductsState = {
   currentPage: 1,
   totalPages: 1,
   hasMore: true,
+  hasInitialized: false,
 };
 
 // Helper function to apply filters and sorting
@@ -129,6 +130,7 @@ const productsSlice = createSlice({
       state.filteredProducts = [];
       state.currentPage = 1;
       state.hasMore = true;
+      state.hasInitialized = false;
     },
     setFilters: (state, action: PayloadAction<ProductFilters>) => {
       state.filters = action.payload;
@@ -177,6 +179,7 @@ const productsSlice = createSlice({
       state.currentPage = action.payload.currentPage;
       state.totalPages = action.payload.totalPages;
       state.hasMore = action.payload.hasMore;
+      state.hasInitialized = true;
       state.filteredProducts = applyFiltersAndSort(state.products, state.filters, state.sort);
       state.error = null;
     });

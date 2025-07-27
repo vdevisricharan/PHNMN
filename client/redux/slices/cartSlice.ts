@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { CartItem, Product } from '../types';
+import { CartItem, Product, CartState } from '../types';
 import {
   getCart as getCartApi,
   addToCart as addToCartApi,
@@ -12,20 +12,13 @@ export interface CartItemPopulated extends Omit<CartItem, 'productId'> {
   productId: Product;
 }
 
-interface CartState {
-  items: CartItemPopulated[];
-  quantity: number;
-  total: number;
-  isFetching: boolean;
-  error: string | null;
-}
-
 const initialState: CartState = {
   items: [],
   quantity: 0,
   total: 0,
   isFetching: false,
   error: null,
+  hasInitialized: false,
 };
 
 // Helper function for calculating cart totals
@@ -97,6 +90,7 @@ const cartSlice = createSlice({
       const totals = calculateCartTotals(action.payload);
       state.quantity = totals.quantity;
       state.total = totals.total;
+      state.hasInitialized = true;
       state.error = null;
     });
     builder.addCase(fetchCart.rejected, (state, action) => {

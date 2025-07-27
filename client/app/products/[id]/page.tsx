@@ -1,6 +1,6 @@
 //products/[id]/page.tsx
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -62,6 +62,27 @@ export default function ProductsPage() {
   const { filters, sort, filteredProducts, isFetching } = useSelector((state: RootState) => state.products);
   
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Helper function to get sort value from Redux
+  const getSortValueFromRedux = () => {
+    if (!sort) return 'newest';
+    
+    if (sort.field === 'price') {
+      return sort.direction === 'asc' ? 'price-asc' : 'price-desc';
+    } else if (sort.field === 'rating') {
+      return 'rating-desc';
+    } else if (sort.field === 'name') {
+      return 'name-asc';
+    }
+    
+    return 'newest';
+  };
+
+  // Memoize empty filters to prevent unnecessary re-renders
+  const emptyFilters = useMemo(() => ({}), []);
+  
+  // Memoize sort value to prevent unnecessary re-renders
+  const sortValue = useMemo(() => getSortValueFromRedux(), [sort]);
 
   // Initialize search on mount
   useEffect(() => {
@@ -152,20 +173,6 @@ export default function ProductsPage() {
     } else {
       return SIZES.filter(size => isNaN(Number(size)) && size !== "UNIVERSAL");
     }
-  };
-
-  const getSortValueFromRedux = () => {
-    if (!sort) return 'newest';
-    
-    if (sort.field === 'price') {
-      return sort.direction === 'asc' ? 'price-asc' : 'price-desc';
-    } else if (sort.field === 'rating') {
-      return 'rating-desc';
-    } else if (sort.field === 'name') {
-      return 'name-asc';
-    }
-    
-    return 'newest';
   };
 
   return (
@@ -345,8 +352,8 @@ export default function ProductsPage() {
           <div className="transition-all duration-300 ease-in-out">
             <Products 
               category={searchQuery ? undefined : category} 
-              filters={{}} 
-              sort={getSortValueFromRedux() as any}
+              filters={emptyFilters} 
+              sort={sortValue as any}
             />
           </div>
         </div>

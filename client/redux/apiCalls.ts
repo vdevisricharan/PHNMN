@@ -16,7 +16,7 @@ interface RegisterData {
   email: string;
   password: string;
   phone?: string;
-  dateOfBirth?: Date;
+  dateOfBirth?: string;
 }
 
 interface AddressData {
@@ -91,7 +91,7 @@ export const getProfile = async () => {
   return res.data;
 };
 
-export const updateProfile = async (data: { name?: string; phone?: string; dateOfBirth?: Date }) => {
+export const updateProfile = async (data: { name?: string; phone?: string; dateOfBirth?: string }) => {
   const res = await api.put<User>('/api/users/profile', data);
   return res.data;
 };
@@ -292,7 +292,8 @@ export const addToWishlist = async (productId: string) => {
 };
 
 export const removeFromWishlist = async (productId: string) => {
-  await api.delete(`/api/users/wishlist/${productId}`);
+  const res = await api.delete(`/api/users/wishlist/${productId}`);
+  return res.data;
 };
 
 // Utility Functions

@@ -17,6 +17,7 @@ import walletReducer from './slices/walletSlice';
 import pointsReducer from './slices/pointsSlice';
 import addressReducer from './slices/addressSlice';
 import orderReducer from './slices/orderSlice';
+import { toastReducer } from '../components/Toast';
 
 export interface RootState {
   user: UserState;
@@ -27,6 +28,7 @@ export interface RootState {
   points: PointsState;
   address: AddressState;
   order: OrderState;
+  toast: { toasts: Array<{ id: string; message: string; type: 'success' | 'error' | 'info'; duration?: number }> };
 }
 
 const store = configureStore({
@@ -39,6 +41,7 @@ const store = configureStore({
     points: pointsReducer,
     address: addressReducer,
     order: orderReducer,
+    toast: toastReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
