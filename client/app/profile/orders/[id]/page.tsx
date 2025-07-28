@@ -168,7 +168,7 @@ const OrderDetailsPage = () => {
             <p className="text-gray-600 mb-6">
               {error || 'The order you are looking for does not exist or you do not have access to it.'}
             </p>
-            <Link href="/orders">
+            <Link href="/profile/orders">
               <button className="px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors">
                 Back to Orders
               </button>
@@ -188,7 +188,7 @@ const OrderDetailsPage = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <div className="flex items-center">
-              <Link href="/orders" className="text-gray-600 hover:text-gray-900 transition-colors mr-4">
+              <Link href="/profile/orders" className="text-gray-600 hover:text-gray-900 transition-colors mr-4">
                 <ArrowBackOutlined />
               </Link>
               <div>

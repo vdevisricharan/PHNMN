@@ -13,9 +13,8 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { Address } from '@/redux/slices/userSlice';
+import { Address } from '@/redux/types';
 import {
-  fetchAddresses,
   createAddress,
   editAddress,
   removeAddress,
@@ -57,10 +56,6 @@ const AddressesPage = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [formData, setFormData] = useState<AddressFormData>(initialFormData);
-
-  useEffect(() => {
-    dispatch(fetchAddresses());
-  }, [dispatch]);
 
   useEffect(() => {
     if (editingAddress) {

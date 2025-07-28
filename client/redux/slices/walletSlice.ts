@@ -13,6 +13,7 @@ const initialState: WalletState = {
   error: null,
   currentPage: 1,
   hasMore: true,
+  hasInitialized: false,
 };
 
 // Async Thunks
@@ -62,6 +63,7 @@ const walletSlice = createSlice({
     builder.addCase(fetchWalletBalance.fulfilled, (state, action) => {
       state.isFetching = false;
       state.balance = action.payload.balance;
+      state.hasInitialized = true;
       state.error = null;
     });
     builder.addCase(fetchWalletBalance.rejected, (state, action) => {

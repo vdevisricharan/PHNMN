@@ -172,6 +172,7 @@ export interface ProductsState {
   currentPage: number;
   totalPages: number;
   hasMore: boolean;
+  hasInitialized: boolean;
 }
 
 export interface CartState {
@@ -180,6 +181,7 @@ export interface CartState {
   total: number;
   isFetching: boolean;
   error: string | null;
+  hasInitialized: boolean;
 }
 
 export interface OrderState {
@@ -190,12 +192,14 @@ export interface OrderState {
   currentPage: number;
   hasMore: boolean;
   checkoutLoading: boolean;
+  hasInitialized: boolean;
 }
 
 export interface WishlistState {
   items: WishlistItemPopulated[];
   isFetching: boolean;
   error: string | null;
+  hasInitialized: boolean;
 }
 
 export interface WalletState {
@@ -205,6 +209,7 @@ export interface WalletState {
   error: string | null;
   currentPage: number;
   hasMore: boolean;
+  hasInitialized: boolean;
 }
 
 export interface PointsState {
@@ -214,10 +219,12 @@ export interface PointsState {
   error: string | null;
   currentPage: number;
   hasMore: boolean;
+  hasInitialized: boolean;
 }
 
 export interface AddressState {
   addresses: Address[];
   isFetching: boolean;
   error: string | null;
+  hasInitialized: boolean;
 } 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ReduxProvider from '../redux/Provider';
 import { Urbanist } from "next/font/google";
+import { ToastContainer } from '../components/Toast';
 
 export const metadata: Metadata = {
   title: "PHNMN",
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={urbanist.className}>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          {children}
+          <ToastContainer />
+        </ReduxProvider>
       </body>
     </html>
   );

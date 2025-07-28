@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register as registerApi } from "@/redux/apiCalls";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/redux/store";
+import { register, login } from "@/redux/slices/userSlice";
 import Link from "next/link";
 
 interface RegisterForm {
@@ -35,6 +37,7 @@ export default function RegisterPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -66,15 +69,25 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await registerApi({
+      // Register the user
+      await dispatch(register({
         name: inputs.name,
         email: inputs.email,
         password: inputs.password,
         phone: inputs.phone || undefined,
-        dateOfBirth: inputs.dateOfBirth ? new Date(inputs.dateOfBirth) : undefined,
-      });
-      setSuccessMessage("Registration successful! Redirecting to login...");
-      setTimeout(() => router.push("/login"), 2000);
+        dateOfBirth: inputs.dateOfBirth || undefined,
+      })).unwrap();
+
+      setSuccessMessage("Registration successful! Logging you in...");
+      
+      // Automatically log the user in after successful registration
+      await dispatch(login({ 
+        email: inputs.email, 
+        password: inputs.password 
+      })).unwrap();
+      
+      // Redirect to home page
+      router.replace("/");
     } catch (error) {
       const apiError = error as ApiError;
       setErrorMessage(apiError.response?.data?.error || apiError.message || "Registration failed. Please try again.");

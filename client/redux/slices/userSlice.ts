@@ -27,7 +27,7 @@ export const login = createAsyncThunk(
 
 export const register = createAsyncThunk(
   'user/register',
-  async (data: { name: string; email: string; password: string; phone?: string; dateOfBirth?: Date }) => {
+  async (data: { name: string; email: string; password: string; phone?: string; dateOfBirth?: string }) => {
     const response = await registerApi(data);
     return response;
   }
@@ -43,7 +43,7 @@ export const fetchProfile = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'user/updateProfile',
-  async (data: { name?: string; phone?: string; dateOfBirth?: Date }) => {
+  async (data: { name?: string; phone?: string; dateOfBirth?: string }) => {
     const response = await updateProfileApi(data);
     return response;
   }

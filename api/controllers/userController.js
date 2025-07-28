@@ -244,7 +244,9 @@ exports.addToWishlist = async (req, res) => {
       await user.save();
     }
 
-    res.json(user.wishlist);
+    // Return populated wishlist
+    const updatedUser = await User.findById(req.user.id).populate('wishlist.productId');
+    res.json(updatedUser.wishlist);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -255,7 +257,10 @@ exports.removeFromWishlist = async (req, res) => {
     await User.findByIdAndUpdate(req.user.id, {
       $pull: { wishlist: { productId: req.params.productId } }
     });
-    res.sendStatus(204);
+    
+    // Return updated populated wishlist
+    const updatedUser = await User.findById(req.user.id).populate('wishlist.productId');
+    res.json(updatedUser.wishlist);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

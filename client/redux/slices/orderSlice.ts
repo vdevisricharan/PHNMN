@@ -20,6 +20,7 @@ const initialState: OrderState = {
   currentPage: 1,
   hasMore: true,
   checkoutLoading: false,
+  hasInitialized: false,
 };
 
 // Async Thunks
@@ -119,6 +120,7 @@ const orderSlice = createSlice({
       state.orders = [];
       state.currentPage = 1;
       state.hasMore = true;
+      state.hasInitialized = false;
     },
   },
   extraReducers: (builder) => {
@@ -156,6 +158,7 @@ const orderSlice = createSlice({
       }
       state.currentPage = action.payload.currentPage;
       state.hasMore = action.payload.hasMore;
+      state.hasInitialized = true;
       state.error = null;
     });
     builder.addCase(fetchOrders.rejected, (state, action) => {

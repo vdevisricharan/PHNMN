@@ -11,7 +11,7 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { fetchWalletBalance, fetchWalletTransactions, addWalletMoney } from '@/redux/slices/walletSlice';
+import { fetchWalletTransactions, addWalletMoney } from '@/redux/slices/walletSlice';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -22,9 +22,11 @@ const WalletPage = () => {
   const [amount, setAmount] = useState('');
 
   useEffect(() => {
-    dispatch(fetchWalletBalance());
-    dispatch(fetchWalletTransactions({ page: 1, limit: 10 }));
-  }, [dispatch]);
+    // Only fetch transactions if we don't have any yet and not currently fetching
+    if (transactions.length === 0 && !isFetching) {
+      dispatch(fetchWalletTransactions({ page: 1, limit: 10 }));
+    }
+  }, [dispatch, transactions.length, isFetching]);
 
   const handleLoadMore = () => {
     if (!isFetching && hasMore) {
@@ -67,11 +69,7 @@ const WalletPage = () => {
               <AccountBalanceWalletOutlined className="mr-2" />
               <span className="text-lg">Available Balance</span>
             </div>
-            {isFetching ? (
-              <div className="h-12 w-32 bg-blue-700 animate-pulse  mb-6"></div>
-            ) : (
-              <div className="text-4xl sm:text-5xl font-bold mb-6">₹{balance}</div>
-            )}
+            <div className="text-4xl sm:text-5xl font-bold mb-6">₹{balance}</div>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowAddMoneyModal(true)}

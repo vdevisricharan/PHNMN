@@ -30,6 +30,26 @@ export default function CartPage() {
   const shippingCost = cart.total > 1000 ? 0 : 99;
   const finalTotal = cart.total + shippingCost;
 
+  // Show loading state when cart is being fetched initially
+  if (cart.isFetching && cart.items.length === 0) {
+    return (
+      <>
+        <Navbar />
+        <main className="bg-gray-50 min-h-screen">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 tracking-wide text-center mb-8">
+              CART
+            </h1>
+            <div className="flex justify-center py-20">
+              <div className="animate-spin h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />

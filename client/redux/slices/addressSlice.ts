@@ -12,12 +12,14 @@ interface AddressState {
   addresses: Address[];
   isFetching: boolean;
   error: string | null;
+  hasInitialized: boolean;
 }
 
 const initialState: AddressState = {
   addresses: [],
   isFetching: false,
   error: null,
+  hasInitialized: false,
 };
 
 // Async Thunks
@@ -78,6 +80,7 @@ const addressSlice = createSlice({
     builder.addCase(fetchAddresses.fulfilled, (state, action) => {
       state.isFetching = false;
       state.addresses = action.payload;
+      state.hasInitialized = true;
       state.error = null;
     });
     builder.addCase(fetchAddresses.rejected, (state, action) => {
