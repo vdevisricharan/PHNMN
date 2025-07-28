@@ -20,10 +20,8 @@ import {
   removeFromWishlist, 
   addToWishlistOptimistic, 
   removeFromWishlistOptimistic,
-  clearError
 } from "@/redux/slices/wishlistSlice";
 import { useProductStatus } from "@/hooks/useProductStatus";
-import { useToast } from "./Toast";
 import type { AppDispatch, RootState } from "@/redux/store";
 import type { Product } from "@/redux/types";
 
@@ -35,7 +33,6 @@ export default function ProductCard({ item }: Props) {
   const [isHydrated, setIsHydrated] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const toast = useToast();
   
   // Get authentication status and wishlist error
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
@@ -48,16 +45,7 @@ export default function ProductCard({ item }: Props) {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  
-  // Show toast for wishlist errors
-  useEffect(() => {
-    if (wishlistError && isHydrated) {
-      toast.error(wishlistError);
-      // Clear the error after showing toast
-      dispatch(clearError());
-    }
-  }, [wishlistError, toast, isHydrated, dispatch]);
-  
+
   // Safety checks for required data
   if (!item || !item._id || !item.images || item.images.length === 0) {
     return null; // Don't render if essential data is missing
@@ -93,7 +81,6 @@ export default function ProductCard({ item }: Props) {
         await dispatch(addToWishlist(item._id)).unwrap();
       }
     } catch (error) {
-      // Toast will be shown automatically due to error handling in wishlist slice
       // The optimistic change will be reverted automatically in the slice
       console.error('Wishlist operation failed:', error);
     }
@@ -203,6 +190,7 @@ export default function ProductCard({ item }: Props) {
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
                 disabled={(cartItem?.quantity || 1) <= 1}
                 type="button"
+                title="Decrease Quantity"
               >
                 <RemoveOutlined className="text-[16px]" />
               </button>
@@ -214,6 +202,7 @@ export default function ProductCard({ item }: Props) {
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
                 disabled={!isInStock()}
                 type="button"
+                title="Increase Quantity"
               >
                 <AddOutlined className="text-[16px]" />
               </button>
@@ -273,6 +262,7 @@ export default function ProductCard({ item }: Props) {
             className="flex items-center justify-center w-10 h-10 border border-gray-300 hover:border-gray-400 transition-colors"
             aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
             type="button"
+            title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
           >
             {isInWishlist ? (
               <FavoriteOutlined className="text-red-500 text-[18px]" />
@@ -288,6 +278,7 @@ export default function ProductCard({ item }: Props) {
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
                 disabled={(cartItem?.quantity || 1) <= 1}
                 type="button"
+                title="Decrease Quantity"
               >
                 <RemoveOutlined className="text-[16px]" />
               </button>
@@ -299,6 +290,7 @@ export default function ProductCard({ item }: Props) {
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
                 disabled={!isInStock()}
                 type="button"
+                title="Increase Quantity"
               >
                 <AddOutlined className="text-[16px]" />
               </button>
