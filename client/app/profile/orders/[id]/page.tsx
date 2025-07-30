@@ -35,7 +35,7 @@ const OrderDetailsPage = () => {
     reason: string;
   }>>([]);
   const [returnReason, setReturnReason] = useState('');
-  const [trackingData, setTrackingData] = useState<any>(null);
+  // const [trackingData, setTrackingData] = useState<any>(null);
 
   useEffect(() => {
     if (id) {
@@ -62,10 +62,11 @@ const OrderDetailsPage = () => {
   };
 
   const handleTrackOrder = async () => {
-    const result = await dispatch(trackOrder(id as string));
-    if (result.payload) {
-      setTrackingData(result.payload);
-    }
+    // const result = await dispatch(trackOrder(id as string));
+    // if (result.payload) {
+    //   setTrackingData(result.payload);
+    // }
+    return;
   };
 
   const handleReturnRequest = async () => {
@@ -389,7 +390,7 @@ const OrderDetailsPage = () => {
           </div>
 
           {/* Tracking Information */}
-          {trackingData && (
+          {/* {trackingData && (
             <div className="bg-white shadow-lg p-6 mt-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Tracking Information</h2>
               <div className="space-y-4">
@@ -410,7 +411,7 @@ const OrderDetailsPage = () => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </main>
 

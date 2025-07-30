@@ -5,7 +5,6 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { 
-  fetchProducts, 
   setFilters, 
   setSort, 
   clearFilters, 
@@ -42,15 +41,6 @@ const PRICE_RANGES = [
   { min: 10000, max: undefined, label: "Above ₹10,000" }
 ];
 
-// Main categories from the products dump
-const CATEGORIES = [
-  "TOP-WEAR",
-  "BOTTOM-WEAR",
-  "ACCESSORIES",
-  "SUMMER",
-  "AUTUMN-WINTER"
-];
-
 export default function ProductsPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -59,7 +49,7 @@ export default function ProductsPage() {
   const category = params.id as string;
   const searchQuery = searchParams.get('search') || '';
   
-  const { filters, sort, filteredProducts, isFetching } = useSelector((state: RootState) => state.products);
+  const { filters, sort, filteredProducts } = useSelector((state: RootState) => state.products);
   
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -189,7 +179,7 @@ export default function ProductsPage() {
               <div className="h-1 w-24 bg-white mx-auto"></div>
               {searchQuery && (
                 <p className="text-gray-300 mt-4">
-                  Found {filteredProducts.length} result(s) for "{searchQuery}"
+                  Found {filteredProducts.length} result(s) for &quot;{searchQuery}&quot;
                 </p>
               )}
             </div>
@@ -353,7 +343,7 @@ export default function ProductsPage() {
             <Products 
               category={searchQuery ? undefined : category} 
               filters={emptyFilters} 
-              sort={sortValue as any}
+              sort={sortValue}
             />
           </div>
         </div>

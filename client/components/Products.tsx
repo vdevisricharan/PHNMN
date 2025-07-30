@@ -16,7 +16,7 @@ type ProductsProps = {
     minPrice?: number;
     maxPrice?: number;
   };
-  sort?: 'newest' | 'price-asc' | 'price-desc' | 'rating-desc';
+  sort?: 'newest' | 'price-asc' | 'price-desc' | 'rating-desc' | 'name-asc' | 'name-desc';
 };
 
 const Products = ({ category, filters: propFilters = {}, sort: propSort = "newest" }: ProductsProps) => {
