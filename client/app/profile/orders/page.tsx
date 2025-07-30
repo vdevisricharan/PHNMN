@@ -110,7 +110,7 @@ const OrdersPage = () => {
             {/* Filter Toggle */}
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 transition-colors"
+              className="flex text-black items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 transition-colors"
               type="button"
             >
               <FilterListOutlined className="text-gray-600" />
@@ -132,7 +132,8 @@ const OrdersPage = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border border-gray-300 px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="text-black border border-gray-300 px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  title='Filter by order status'
                 >
                   <option value="">All Orders</option>
                   <option value="pending">Pending</option>
@@ -193,8 +194,8 @@ const OrdersPage = () => {
                       <div key={`${item.productId._id}-${item.size}-${item.color}`} className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-gray-100 flex-shrink-0 overflow-hidden">
                           <Image
-                            src={item.productId.images[0]}
-                            alt={item.productId.name}
+                            src={item.productId?.images[0]}
+                            alt={item.productId?.name}
                             width={64}
                             height={64}
                             className="w-full h-full object-cover"
@@ -202,7 +203,7 @@ const OrdersPage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {item.productId.name}
+                            {item.productId?.name}
                           </h4>
                           <div className="flex items-center gap-4 text-xs text-gray-600">
                             <span>Size: {item.size}</span>
@@ -229,7 +230,7 @@ const OrdersPage = () => {
                   <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
                     <div className="flex flex-wrap gap-3">
                       <Link href={`/profile/orders/${order._id}`}>
-                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 transition-colors text-sm font-medium">
+                        <button className="flex items-center gap-2 px-4 py-2 text-black border border-gray-300 hover:bg-gray-100 transition-colors text-sm font-medium">
                           <VisibilityOutlined style={{ fontSize: 16 }} />
                           View Details
                         </button>

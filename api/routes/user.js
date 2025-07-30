@@ -30,6 +30,7 @@ router.get('/cart', auth, userController.getCart);
 router.post('/cart', auth, userController.addToCart);
 router.put('/cart/:productId', auth, userController.updateCartItem);
 router.delete('/cart/:productId', auth, userController.removeFromCart);
+router.delete('/cart', auth, userController.clearCart);
 
 // Addresses
 router.get('/addresses', auth, userController.getAddresses);

@@ -97,19 +97,19 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h1 className="text-center text-3xl font-semibold text-gray-900 mb-8">
+        <h1 className="text-center text-3xl font-semibold text-white mb-8">
           PHNMN
         </h1>
-        <h2 className="text-center text-2xl font-medium text-gray-900">
+        <h2 className="text-center text-2xl font-medium text-white">
           Create your account
         </h2>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6 text-black" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
@@ -148,7 +148,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                 Phone Number (optional)
               </label>
@@ -180,7 +180,7 @@ export default function RegisterPage() {
                   className="appearance-none block w-full px-3 py-2 border border-gray-300  shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                 />
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">

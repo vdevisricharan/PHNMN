@@ -113,13 +113,19 @@ export const addWalletMoney = async (amount: number) => {
 };
 
 export const getWalletTransactions = async (page: number = 1, limit: number = 10) => {
-  const res = await api.get<Array<{
-    _id: string;
-    type: 'credit' | 'debit';
-    amount: number;
-    description: string;
-    createdAt: Date;
-  }>>(`/api/users/wallet/transactions?page=${page}&limit=${limit}`);
+  const res = await api.get<{
+    transactions: Array<{
+      _id: string;
+      type: 'credit' | 'debit';
+      amount: number;
+      description: string;
+      createdAt: Date;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  }>(`/api/users/wallet/transactions?page=${page}&limit=${limit}`);
   return res.data;
 };
 
@@ -135,13 +141,19 @@ export const redeemPoints = async (data: { points: number; rewardId: string }) =
 };
 
 export const getPointsTransactions = async (page: number = 1, limit: number = 10) => {
-  const res = await api.get<Array<{
-    _id: string;
-    type: 'earned' | 'redeemed';
-    points: number;
-    description: string;
-    createdAt: Date;
-  }>>(`/api/users/points/transactions?page=${page}&limit=${limit}`);
+  const res = await api.get<{
+    transactions: Array<{
+      _id: string;
+      type: 'earned' | 'redeemed';
+      points: number;
+      description: string;
+      createdAt: Date;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  }>(`/api/users/points/transactions?page=${page}&limit=${limit}`);
   return res.data;
 };
 
@@ -268,7 +280,7 @@ export const processPayment = async (data: {
     success: boolean;
     paymentId: string;
     order: Order;
-  }>('/api/payments/process', data);
+  }>('/api/payments/create-intent', data);
   return res.data;
 };
 

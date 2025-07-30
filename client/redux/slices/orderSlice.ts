@@ -152,7 +152,7 @@ const orderSlice = createSlice({
     builder.addCase(fetchOrders.fulfilled, (state, action) => {
       state.isFetching = false;
       if (action.meta.arg?.page === 1 || !action.meta.arg?.page) {
-        state.orders = action.payload.orders;
+        state.orders = action.payload.orders || [];
       } else {
         state.orders = [...state.orders, ...action.payload.orders];
       }

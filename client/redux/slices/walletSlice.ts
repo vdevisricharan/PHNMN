@@ -37,7 +37,7 @@ export const fetchWalletTransactions = createAsyncThunk(
   'wallet/fetchTransactions',
   async ({ page = 1, limit = 10 }: { page: number; limit: number }) => {
     const response = await getWalletTransactionsApi(page, limit);
-    return { transactions: response, page };
+    return response;
   }
 );
 
@@ -99,7 +99,7 @@ const walletSlice = createSlice({
         state.transactions = [...state.transactions, ...action.payload.transactions];
       }
       state.currentPage = action.payload.page;
-      state.hasMore = action.payload.transactions.length > 0;
+      state.hasMore = action.payload.hasMore;
       state.error = null;
     });
     builder.addCase(fetchWalletTransactions.rejected, (state, action) => {
@@ -110,4 +110,4 @@ const walletSlice = createSlice({
 });
 
 export const { clearError, resetTransactions } = walletSlice.actions;
-export default walletSlice.reducer; 
+export default walletSlice.reducer;

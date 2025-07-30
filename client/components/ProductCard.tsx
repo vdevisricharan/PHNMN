@@ -14,11 +14,11 @@ import {
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { addToCart, updateCartItem } from "@/redux/slices/cartSlice";
-import { 
-  addToWishlist, 
-  removeFromWishlist, 
-  addToWishlistOptimistic, 
+import { addToCart, addToCartOptimistic, updateCartItem, updateCartItemOptimistic } from "@/redux/slices/cartSlice";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  addToWishlistOptimistic,
   removeFromWishlistOptimistic,
 } from "@/redux/slices/wishlistSlice";
 import { useProductStatus } from "@/hooks/useProductStatus";
@@ -33,14 +33,14 @@ export default function ProductCard({ item }: Props) {
   const [isHydrated, setIsHydrated] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  
+
   // Get authentication status and wishlist error
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
   const { error: wishlistError } = useSelector((state: RootState) => state.wishlist);
-  
+
   // Always call the hook (Rules of Hooks compliance)
   const rawProductStatus = useProductStatus(item._id);
-  
+
   // Hydration effect
   useEffect(() => {
     setIsHydrated(true);
@@ -50,24 +50,24 @@ export default function ProductCard({ item }: Props) {
   if (!item || !item._id || !item.images || item.images.length === 0) {
     return null; // Don't render if essential data is missing
   }
-  
+
   // Use hydration-safe values - show empty state during SSR/initial render
-  const { isWishlisted: isInWishlist, cartItem, isInCart } = isHydrated ? rawProductStatus : { 
-    isWishlisted: false, 
-    cartItem: null, 
-    isInCart: false 
+  const { isWishlisted: isInWishlist, cartItem, isInCart } = isHydrated ? rawProductStatus : {
+    isWishlisted: false,
+    cartItem: null,
+    isInCart: false
   };
 
   const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Check if user is authenticated
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-    
+
     try {
       if (isInWishlist) {
         // Optimistically remove from wishlist
@@ -104,7 +104,13 @@ export default function ProductCard({ item }: Props) {
     e.stopPropagation();
     const selectedSize = getFirstAvailableSize();
     const selectedColor = item.colors && item.colors.length > 0 ? item.colors[0] : 'default';
-    
+
+    dispatch(addToCartOptimistic({
+      product: item,
+      size: selectedSize,
+      color: selectedColor,
+      quantity: 1
+    }));
     dispatch(addToCart({
       productId: item._id,
       size: selectedSize,
@@ -117,6 +123,13 @@ export default function ProductCard({ item }: Props) {
     e.preventDefault();
     e.stopPropagation();
     if (cartItem && newQuantity > 0) {
+      dispatch(updateCartItemOptimistic({
+        productId: item._id,
+        size: cartItem.size,
+        color: cartItem.color,
+        quantity: newQuantity,
+        product: item
+      }));
       dispatch(updateCartItem({
         productId: item._id,
         quantity: newQuantity
@@ -137,7 +150,7 @@ export default function ProductCard({ item }: Props) {
           className="object-cover transition-all duration-500 group-hover:scale-105"
           sizes="(max-width: 475px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
         />
-        
+
         {/* Discount Badge */}
         {(item.discount || 0) > 0 && (
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10">
@@ -155,7 +168,7 @@ export default function ProductCard({ item }: Props) {
             </span>
           </div>
         )}
-        
+
         {/* Desktop Action Buttons */}
         <div className="hidden sm:flex absolute top-2 sm:top-3 right-2 sm:right-3 flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
           <button
@@ -179,13 +192,13 @@ export default function ProductCard({ item }: Props) {
             </button>
           </Link>
         </div>
-        
+
         {/* Desktop Quick Add to Cart / Quantity Controls */}
         <div className="hidden sm:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
           {isInCart ? (
             // Show quantity controls if item is in cart
             <div className="flex items-center justify-between bg-gray-900/95 backdrop-blur-sm text-white py-2 sm:py-2.5 lg:py-3 px-3 shadow-md">
-              <button 
+              <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
                 disabled={(cartItem?.quantity || 1) <= 1}
@@ -197,7 +210,7 @@ export default function ProductCard({ item }: Props) {
               <span className="font-medium text-sm lg:text-base">
                 {cartItem?.quantity || 0} in cart
               </span>
-              <button 
+              <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
                 disabled={!isInStock()}
@@ -209,7 +222,7 @@ export default function ProductCard({ item }: Props) {
             </div>
           ) : (
             // Show add to cart button if item is not in cart
-            <button 
+            <button
               className="w-full py-2 sm:py-2.5 lg:py-3 bg-gray-900/95 backdrop-blur-sm text-white font-medium hover:bg-gray-800 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md text-xs sm:text-sm lg:text-base"
               aria-label="Add to Cart"
               type="button"
@@ -222,7 +235,7 @@ export default function ProductCard({ item }: Props) {
           )}
         </div>
       </div>
-      
+
       {/* Product Info */}
       <div className="p-3 sm:p-4 lg:p-5">
         <Link href={`/product/${item._id}`} className="block">
@@ -230,7 +243,7 @@ export default function ProductCard({ item }: Props) {
             {item.name || 'Product Name'}
           </h3>
         </Link>
-        
+
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-1">
             <Star className="text-yellow-400 text-sm" />
@@ -270,10 +283,10 @@ export default function ProductCard({ item }: Props) {
               <FavoriteBorderOutlined className="text-gray-700 text-[18px]" />
             )}
           </button>
-          
+
           {isInCart ? (
             <div className="flex-1 flex items-center justify-between bg-gray-900 text-white py-2 px-3">
-              <button 
+              <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
                 disabled={(cartItem?.quantity || 1) <= 1}
@@ -285,7 +298,7 @@ export default function ProductCard({ item }: Props) {
               <span className="font-medium text-sm">
                 {cartItem?.quantity || 0}
               </span>
-              <button 
+              <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
                 onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
                 disabled={!isInStock()}
@@ -296,7 +309,7 @@ export default function ProductCard({ item }: Props) {
               </button>
             </div>
           ) : (
-            <button 
+            <button
               className="flex-1 py-2 px-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 text-sm"
               onClick={handleAddToCart}
               disabled={!isInStock()}

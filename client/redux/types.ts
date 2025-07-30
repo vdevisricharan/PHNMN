@@ -55,7 +55,7 @@ export interface CartItem {
   size: string;
   color: string;
   quantity: number;
-  addedAt: Date;
+  addedAt: string;
 }
 
 export interface CartItemPopulated extends Omit<CartItem, 'productId'> {
@@ -99,9 +99,14 @@ export interface Order {
 }
 
 export interface CheckoutData {
-  items: CartItem[];
-  shippingAddressId: string;
-  billingAddressId?: string;
+  items: OrderItem[];
+  shippingAddress: Address;
+  billingAddress: Address;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  tax: number;
+  total: number;
   paymentMethod: 'card' | 'wallet' | 'cod';
   pointsToUse?: number;
   cardDetails?: {
@@ -113,7 +118,7 @@ export interface CheckoutData {
 // Wishlist Types
 export interface WishlistItem {
   productId: string;
-  addedAt: Date;
+  addedAt: string;
 }
 
 export interface WishlistItemPopulated extends Omit<WishlistItem, 'productId'> {
@@ -227,4 +232,4 @@ export interface AddressState {
   isFetching: boolean;
   error: string | null;
   hasInitialized: boolean;
-} 
+}

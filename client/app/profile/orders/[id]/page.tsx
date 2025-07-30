@@ -451,11 +451,12 @@ const OrderDetailsPage = () => {
                             Quantity to Return
                           </label>
                           <select
-                            value={returnItem?.quantity || 0}
+                            value={returnItem?.quantity || 0}                  
                             onChange={(e) => updateReturnItem(item.productId._id, 'quantity', Number(e.target.value))}
                             className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            title='Select quantity to return'
                           >
-                            <option value={0}>Don't return</option>
+                            <option value={0}>Don&apos;t return</option>
                             {Array.from({ length: item.quantity }, (_, i) => (
                               <option key={i + 1} value={i + 1}>{i + 1}</option>
                             ))}
@@ -471,6 +472,7 @@ const OrderDetailsPage = () => {
                             onChange={(e) => updateReturnItem(item.productId._id, 'reason', e.target.value)}
                             className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             disabled={!returnItem?.quantity}
+                            title='Select reason for return'
                           >
                             <option value="">Select reason</option>
                             <option value="defective">Defective/Damaged</option>

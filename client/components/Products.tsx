@@ -6,7 +6,6 @@ import ProductCard from "./ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { setFilters, setSort, clearFilters } from "@/redux/slices/productsSlice";
-import { useRouter } from "next/navigation";
 import type { ProductFilters, ProductSort } from "@/redux/types";
 
 type ProductsProps = {
@@ -22,7 +21,6 @@ type ProductsProps = {
 
 const Products = ({ category, filters: propFilters = {}, sort: propSort = "newest" }: ProductsProps) => {
   const [isHydrated, setIsHydrated] = useState(false);
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   
   const { 
@@ -37,12 +35,7 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
   // Memoize the filters to prevent unnecessary re-renders
   const memoizedFilters = useMemo(() => {
     return propFilters;
-  }, [
-    JSON.stringify(propFilters.colors || []),
-    JSON.stringify(propFilters.sizes || []),
-    propFilters.minPrice,
-    propFilters.maxPrice
-  ]);
+  }, [propFilters]);
 
   // Memoize the sort value
   const memoizedSort = useMemo(() => {

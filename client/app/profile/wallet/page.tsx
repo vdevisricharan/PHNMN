@@ -17,16 +17,15 @@ import Footer from '@/components/Footer';
 
 const WalletPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { balance, transactions, isFetching, error, hasMore, currentPage } = useSelector((state: RootState) => state.wallet);
+  const { balance, transactions, isFetching, error, hasMore, currentPage, hasInitialized } = useSelector((state: RootState) => state.wallet);
   const [showAddMoneyModal, setShowAddMoneyModal] = useState(false);
   const [amount, setAmount] = useState('');
 
   useEffect(() => {
-    // Only fetch transactions if we don't have any yet and not currently fetching
-    if (transactions.length === 0 && !isFetching) {
-      dispatch(fetchWalletTransactions({ page: 1, limit: 10 }));
-    }
-  }, [dispatch, transactions.length, isFetching]);
+  if (!hasInitialized && !isFetching) {
+    dispatch(fetchWalletTransactions({ page: 1, limit: 10 }));
+  }
+}, [dispatch, hasInitialized, isFetching]);
 
   const handleLoadMore = () => {
     if (!isFetching && hasMore) {

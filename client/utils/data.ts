@@ -16,6 +16,15 @@ export const sliderItems = [
     bg: "#a8a8a8",
     image_url: "https://assets.therowdy.club/1734208111810blackhoodie.jpg",
     cat: "AUTUMN-WINTER",
+  },
+  {
+    id: 3,
+    title: "ACCESSORIES",
+    description: "Complete your look with our exclusive accessories",
+    button: "SHOP NOW",
+    bg: "#a8a8a8",
+    image_url: "https://assets.therowdy.club/1750080085988Inkeds.jpg",
+    cat: "ACCESSORIES",
   }
 ];
 

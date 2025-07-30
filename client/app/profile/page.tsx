@@ -72,8 +72,8 @@ const ProfilePage = () => {
                 <div className="flex items-center text-gray-600">
                   <span className="font-medium">Date of Birth:</span>
                   <span className="ml-2">
-                    {currentUser.dateOfBirth 
-                      ? new Date(currentUser.dateOfBirth).toLocaleDateString() 
+                    {currentUser.dateOfBirth
+                      ? new Date(currentUser.dateOfBirth).toLocaleDateString()
                       : 'Not added'}
                   </span>
                 </div>
@@ -153,7 +153,7 @@ const ProfilePage = () => {
                   <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-900 mx-auto"></div>
                 </div>
               ) : Array.isArray(orders) && orders.length > 0 ? (
-                orders.slice(0, 3).map((order) => (
+                orders.map((order) => (
                   <div key={order._id} className="p-6 hover:bg-gray-50">
                     <div className="flex items-center justify-between mb-3">
                       <div>
@@ -166,12 +166,11 @@ const ProfilePage = () => {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-gray-900">₹{order.total.toLocaleString()}</div>
-                        <div className={`text-xs px-2 py-1 inline-block uppercase tracking-wide font-medium ${
-                          order.orderStatus === 'delivered' ? 'bg-green-100 text-green-800' :
-                          order.orderStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                          order.orderStatus === 'cancelled' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
+                        <div className={`text-xs px-2 py-1 inline-block uppercase tracking-wide font-medium ${order.orderStatus === 'delivered' ? 'bg-green-100 text-green-800' :
+                            order.orderStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                              order.orderStatus === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                          }`}>
                           {order.orderStatus}
                         </div>
                       </div>
@@ -190,7 +189,9 @@ const ProfilePage = () => {
                 <div className="p-6 text-center">
                   <p className="text-gray-600 mb-4">No recent orders found.</p>
                   <Link href="/">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">
+                    <button className="text-blue-600 hover:text-blue-800 font-medium"
+                      type='button'
+                    >
                       Start Shopping
                     </button>
                   </Link>

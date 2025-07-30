@@ -121,7 +121,7 @@ const AddressesPage = () => {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-8 sm:py-12">
+      <main className="min-h-screen bg-gray-50 py-8 sm:py-12 text-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header with Back Button */}
           <div className="flex items-center justify-between mb-6">
@@ -254,6 +254,7 @@ const AddressesPage = () => {
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value as 'home' | 'office' | 'other' })}
                         className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title='Select address type'
                       >
                         <option value="home">Home</option>
                         <option value="office">Office</option>
@@ -270,6 +271,7 @@ const AddressesPage = () => {
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title='Full Name'
                         required
                       />
                     </div>
@@ -283,6 +285,7 @@ const AddressesPage = () => {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title='Phone Number'
                         required
                       />
                     </div>
@@ -296,6 +299,7 @@ const AddressesPage = () => {
                         value={formData.street}
                         onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title='Street Address'
                         required
                       />
                     </div>
@@ -309,6 +313,7 @@ const AddressesPage = () => {
                         value={formData.locality}
                         onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title='Locality/Area'
                         required
                       />
                     </div>
@@ -323,6 +328,7 @@ const AddressesPage = () => {
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          title="City"
                           required
                         />
                       </div>
@@ -336,6 +342,7 @@ const AddressesPage = () => {
                           value={formData.state}
                           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          title="State"
                           required
                         />
                       </div>
@@ -351,6 +358,7 @@ const AddressesPage = () => {
                           value={formData.postalCode}
                           onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          title='Postal Code'
                           required
                         />
                       </div>
@@ -364,6 +372,7 @@ const AddressesPage = () => {
                           value={formData.country}
                           onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          title="Country"
                           required
                         />
                       </div>

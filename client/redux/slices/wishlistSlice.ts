@@ -82,7 +82,7 @@ const wishlistSlice = createSlice({
         // Add the item optimistically
         const wishlistItem: WishlistItemPopulated = {
           productId: product,
-          addedAt: new Date()
+          addedAt: new Date().toISOString()
         };
         state.items.push(wishlistItem);
       }

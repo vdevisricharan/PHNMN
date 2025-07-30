@@ -4,9 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch, RootState } from '@/redux/store';
 import { checkout } from '@/redux/slices/orderSlice';
-import { fetchAddresses } from '@/redux/slices/addressSlice';
-import { fetchPointsBalance } from '@/redux/slices/pointsSlice';
-import { fetchWalletBalance } from '@/redux/slices/walletSlice';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -22,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import type { CheckoutData, Address } from '@/redux/types';
+import type { CheckoutData } from '@/redux/types';
 
 const CheckoutPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,10 +49,6 @@ const CheckoutPage = () => {
       router.push('/cart');
       return;
     }
-
-    dispatch(fetchAddresses());
-    dispatch(fetchPointsBalance());
-    dispatch(fetchWalletBalance());
   }, [dispatch, currentUser, cartItems.length, router]);
 
   useEffect(() => {
@@ -93,15 +86,35 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      // Find the selected address object
+      const shippingAddressObj = addresses.find(addr => addr._id === selectedAddress);
+
+      if (!shippingAddressObj) {
+        alert('Invalid shipping address');
+        setIsProcessing(false);
+        return;
+      }
+
+      // If you want to support separate billing address, add logic here.
+      // For now, billingAddress = shippingAddress
+      const billingAddressObj = shippingAddressObj;
+
       const checkoutData: CheckoutData = {
         items: cartItems.map(item => ({
           productId: item.productId._id,
           size: item.size,
           color: item.color,
           quantity: item.quantity,
-          addedAt: item.addedAt
+          price: item.productId.price,
+          discountedPrice: item.productId.price * (1 - item.productId.discount / 100),
         })),
-        shippingAddressId: selectedAddress,
+        shippingAddress: shippingAddressObj,
+        billingAddress: billingAddressObj,
+        subtotal: cartTotal,
+        discount: 0,
+        shipping: shippingCost,
+        tax,
+        total: finalTotal,
         paymentMethod,
         pointsToUse: pointsToUse || undefined,
         cardDetails: paymentMethod === 'card' && cardToken ? {
@@ -111,9 +124,9 @@ const CheckoutPage = () => {
       };
 
       const result = await dispatch(checkout(checkoutData));
-      
+
       if (result.type === 'order/checkout/fulfilled') {
-        router.push(`/success?orderId=${result.payload._id}`);
+        router.push(`/success`);
       }
     } catch (err) {
       console.error('Checkout failed:', err);
@@ -127,8 +140,6 @@ const CheckoutPage = () => {
     setCardToken('tok_' + Math.random().toString(36).substr(2, 9));
     setCardLast4('1234');
   };
-
-  const selectedAddressData = addresses.find(addr => addr._id === selectedAddress);
 
   return (
     <>
@@ -442,4 +453,4 @@ const CheckoutPage = () => {
   );
 };
 
-export default CheckoutPage; 
+export default CheckoutPage;

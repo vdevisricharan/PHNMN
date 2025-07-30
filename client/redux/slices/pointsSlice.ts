@@ -37,7 +37,7 @@ export const fetchPointsTransactions = createAsyncThunk(
   'points/fetchTransactions',
   async ({ page = 1, limit = 10 }: { page: number; limit: number }) => {
     const response = await getPointsTransactionsApi(page, limit);
-    return { transactions: response, page };
+    return response;
   }
 );
 
@@ -99,7 +99,7 @@ const pointsSlice = createSlice({
         state.transactions = [...state.transactions, ...action.payload.transactions];
       }
       state.currentPage = action.payload.page;
-      state.hasMore = action.payload.transactions.length > 0;
+      state.hasMore = action.payload.hasMore;
       state.error = null;
     });
     builder.addCase(fetchPointsTransactions.rejected, (state, action) => {

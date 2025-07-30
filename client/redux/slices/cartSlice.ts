@@ -1,16 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { CartItem, Product, CartState } from '../types';
+import { CartItemPopulated, CartState } from '../types';
 import {
   getCart as getCartApi,
   addToCart as addToCartApi,
   updateCartItem as updateCartItemApi,
   removeFromCart as removeFromCartApi
 } from '../apiCalls';
-
-// Extended CartItem type for populated product data
-export interface CartItemPopulated extends Omit<CartItem, 'productId'> {
-  productId: Product;
-}
 
 const initialState: CartState = {
   items: [],
@@ -77,6 +72,59 @@ const cartSlice = createSlice({
       state.quantity = 0;
       state.total = 0;
     },
+    addToCartOptimistic: (state, action) => {
+      const { product, size, color, quantity } = action.payload;
+      const existing = state.items.find(
+        item =>
+          item.productId._id === product._id &&
+          item.size === size &&
+          item.color === color
+      );
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        state.items.push({
+          productId: product,
+          size,
+          color,
+          quantity,
+          addedAt: new Date().toISOString(),
+        });
+      }
+      const totals = calculateCartTotals(state.items);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+    },
+    removeFromCartOptimistic: (state, action) => {
+      const { productId, size, color } = action.payload;
+      state.items = state.items.filter(
+        item =>
+          !(
+            item.productId._id === productId &&
+            item.size === size &&
+            item.color === color
+          )
+      );
+      const totals = calculateCartTotals(state.items);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+    },
+    updateCartItemOptimistic: (state, action) => {
+      const { productId, size, color, quantity, product } = action.payload;
+      const item = state.items.find(
+        item =>
+          item.productId._id === productId &&
+          item.size === size &&
+          item.color === color
+      );
+      if (item && quantity > 0) {
+        item.quantity = quantity;
+        if (product) item.productId = product;
+      }
+      const totals = calculateCartTotals(state.items);
+      state.quantity = totals.quantity;
+      state.total = totals.total;
+    }
   },
   extraReducers: (builder) => {
     // Fetch Cart
@@ -154,5 +202,11 @@ const cartSlice = createSlice({
   },
 });
 
-export const { clearError, clearCart } = cartSlice.actions;
+export const {
+  clearError,
+  clearCart,
+  addToCartOptimistic,
+  removeFromCartOptimistic,
+  updateCartItemOptimistic,
+} = cartSlice.actions;
 export default cartSlice.reducer;

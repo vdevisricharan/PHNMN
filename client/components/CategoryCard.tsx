@@ -23,7 +23,6 @@ const CategoryCard = ({ item }: CategoryCardProps) => (
           fill
           className="object-cover transition-all duration-700 group-hover:scale-110"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          priority={item.id <= 3} // Prioritize first 3 images
         />
         
         {/* Gradient Overlay */}

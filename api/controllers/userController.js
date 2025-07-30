@@ -109,11 +109,25 @@ exports.addWalletMoney = async (req, res) => {
 
 exports.getWalletTransactions = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const user = await User.findById(req.user.id)
-      .select('walletTransactions')
-      .slice('walletTransactions', [(page - 1) * limit, limit]);
-    res.json(user.walletTransactions);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const user = await User.findById(req.user.id).select('walletTransactions');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Paginate walletTransactions array manually
+    const total = user.walletTransactions.length;
+    const transactions = user.walletTransactions
+      .slice(skip, skip + limit);
+
+    res.json({
+      transactions,
+      page,
+      limit,
+      total,
+      hasMore: skip + limit < total
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -154,11 +168,25 @@ exports.redeemPoints = async (req, res) => {
 
 exports.getPointsTransactions = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const user = await User.findById(req.user.id)
-      .select('pointsTransactions')
-      .slice('pointsTransactions', [(page - 1) * limit, limit]);
-    res.json(user.pointsTransactions);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const user = await User.findById(req.user.id).select('pointsTransactions');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Paginate pointsTransactions array manually
+    const total = user.pointsTransactions.length;
+    const transactions = user.pointsTransactions
+      .slice(skip, skip + limit);
+
+    res.json({
+      transactions,
+      page,
+      limit,
+      total,
+      hasMore: skip + limit < total
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -190,7 +218,9 @@ exports.addToCart = async (req, res) => {
     }
 
     await user.save();
-    res.json(user.cart);
+    // Return populated cart
+    const updatedUser = await User.findById(req.user.id).populate('cart.productId');
+    res.json(updatedUser.cart);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -206,7 +236,10 @@ exports.updateCartItem = async (req, res) => {
 
     item.quantity = quantity;
     await user.save();
-    res.json(user.cart);
+
+    // Return populated cart
+    const updatedUser = await User.findById(req.user.id).populate('cart.productId');
+    res.json(updatedUser.cart);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -217,7 +250,20 @@ exports.removeFromCart = async (req, res) => {
     await User.findByIdAndUpdate(req.user.id, {
       $pull: { cart: { productId: req.params.productId } }
     });
-    res.sendStatus(204);
+    // Return updated populated cart
+    const updatedUser = await User.findById(req.user.id).populate('cart.productId');
+    res.json(updatedUser.cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.clearCart = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.cart = [];
+    await user.save();
+    res.json([]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

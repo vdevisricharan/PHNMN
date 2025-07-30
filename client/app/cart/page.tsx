@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import type { RootState, AppDispatch } from "@/redux/store";
 import type { CartItemPopulated } from "@/redux/types";
-import { updateCartItem, removeFromCart } from "@/redux/slices/cartSlice";
+import { updateCartItem, removeFromCart, updateCartItemOptimistic, removeFromCartOptimistic } from "@/redux/slices/cartSlice";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import {
@@ -139,7 +139,12 @@ export default function CartPage() {
                                 <div className="flex items-center border border-gray-700">
                                   <button
                                     className="p-2 sm:p-2 text-black hover:bg-gray-100 transition-colors touch-manipulation"
-                                    onClick={() => dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity - 1 }))}
+                                    onClick={
+                                      () => 
+                                        {
+                                          dispatch(updateCartItemOptimistic({ productId: item.productId._id, quantity: item.quantity - 1 }));
+                                          dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity - 1 }))
+                                        }}
                                     aria-label="Decrease quantity"
                                     type="button"
                                   >
@@ -150,7 +155,10 @@ export default function CartPage() {
                                   </span>
                                   <button
                                     className="p-2 sm:p-2 text-black hover:bg-gray-100 transition-colors touch-manipulation"
-                                    onClick={() => dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity + 1 }))}
+                                    onClick={() => {
+                                      dispatch(updateCartItemOptimistic({ productId: item.productId._id, quantity: item.quantity + 1 }));
+                                      dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity + 1 }));
+                                    }}
                                     aria-label="Increase quantity"
                                     type="button"
                                   >
@@ -161,7 +169,10 @@ export default function CartPage() {
                                 {/* Remove Button - Larger touch target on mobile */}
                                 <button
                                   className="p-2 sm:p-2 text-black hover:text-red-500 transition-colors touch-manipulation"
-                                  onClick={() => dispatch(removeFromCart(item.productId._id))}
+                                  onClick={() => {
+                                    dispatch(removeFromCartOptimistic({ productId: item.productId._id }));
+                                    dispatch(removeFromCart(item.productId._id));
+                                  }}
                                   aria-label="Remove product"
                                   type="button"
                                 >
