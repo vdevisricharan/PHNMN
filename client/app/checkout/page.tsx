@@ -20,11 +20,12 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import type { CheckoutData } from '@/redux/types';
+import { clearCart, clearCartAPI } from '@/redux/slices/cartSlice';
 
 const CheckoutPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  
+
   const { items: cartItems, quantity: cartQuantity, total: cartTotal } = useSelector((state: RootState) => state.cart);
   const { addresses } = useSelector((state: RootState) => state.address);
   const { balance: pointsBalance } = useSelector((state: RootState) => state.points);
@@ -33,7 +34,7 @@ const CheckoutPage = () => {
   const { currentUser } = useSelector((state: RootState) => state.user);
 
   const [selectedAddress, setSelectedAddress] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'cod'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'cod'>('cod');
   const [pointsToUse, setPointsToUse] = useState<number>(0);
   const [cardToken, setCardToken] = useState<string>('');
   const [cardLast4, setCardLast4] = useState<string>('');
@@ -127,6 +128,8 @@ const CheckoutPage = () => {
 
       if (result.type === 'order/checkout/fulfilled') {
         router.push(`/success`);
+        dispatch(clearCart());
+        dispatch(clearCartAPI());
       }
     } catch (err) {
       console.error('Checkout failed:', err);
@@ -171,7 +174,9 @@ const CheckoutPage = () => {
                     Shipping Address
                   </h2>
                   <Link href="/profile/addresses">
-                    <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      type='button'
+                    >
                       <AddOutlined style={{ fontSize: 16 }} />
                       Add New
                     </button>
@@ -182,11 +187,10 @@ const CheckoutPage = () => {
                   {addresses.map((address) => (
                     <div
                       key={address._id}
-                      className={`border-2 p-4 cursor-pointer transition-all ${
-                        selectedAddress === address._id
+                      className={`border-2 p-4 cursor-pointer transition-all ${selectedAddress === address._id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                        }`}
                       onClick={() => setSelectedAddress(address._id)}
                     >
                       <div className="flex items-start justify-between">
@@ -230,26 +234,25 @@ const CheckoutPage = () => {
                 <div className="space-y-3">
                   {/* Credit/Debit Card */}
                   <div
-                    className={`border-2 p-4 cursor-pointer transition-all ${
-                      paymentMethod === 'card'
+                    className={`text-black border-2 p-4 cursor-pointer transition-all bg-gray-200 opacity-50 pointer-events-none ${paymentMethod === 'card'
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod('card')}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <CreditCardOutlined className="text-gray-600" />
                         <div>
-                          <div className="font-medium text-gray-900">Credit/Debit Card</div>
-                          <div className="text-sm text-gray-600">Pay securely with your card</div>
+                          <div className="font-medium">Credit/Debit Card</div>
+                          <div className="text-sm">Pay securely with your card</div>
                         </div>
                       </div>
                       {paymentMethod === 'card' && (
                         <CheckCircleOutlined className="text-blue-500" />
                       )}
                     </div>
-                    
+
                     {paymentMethod === 'card' && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <button
@@ -265,11 +268,10 @@ const CheckoutPage = () => {
 
                   {/* Wallet */}
                   <div
-                    className={`border-2 p-4 cursor-pointer transition-all ${
-                      paymentMethod === 'wallet'
+                    className={`border-2 p-4 cursor-pointer transition-all bg-gray-200 opacity-50 pointer-events-none ${paymentMethod === 'wallet'
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    } ${walletBalance < finalTotal ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      } ${walletBalance < finalTotal ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onClick={() => walletBalance >= finalTotal && setPaymentMethod('wallet')}
                   >
                     <div className="flex items-center justify-between">
@@ -293,11 +295,10 @@ const CheckoutPage = () => {
 
                   {/* Cash on Delivery */}
                   <div
-                    className={`border-2 p-4 cursor-pointer transition-all ${
-                      paymentMethod === 'cod'
+                    className={`border-2 p-4 cursor-pointer transition-all ${paymentMethod === 'cod'
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod('cod')}
                   >
                     <div className="flex items-center justify-between">
@@ -323,7 +324,7 @@ const CheckoutPage = () => {
                     <StarsOutlined className="mr-2 text-yellow-500" />
                     Use PHNMN Points
                   </h2>
-                  
+
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -389,14 +390,14 @@ const CheckoutPage = () => {
                       <span>Subtotal ({cartQuantity} items)</span>
                       <span>₹{cartTotal.toLocaleString()}</span>
                     </div>
-                    
+
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Shipping</span>
                       <span className={shippingCost === 0 ? "text-green-600" : ""}>
                         {shippingCost === 0 ? "FREE" : `₹${shippingCost}`}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Tax (18%)</span>
                       <span>₹{tax.toLocaleString()}</span>
@@ -421,11 +422,10 @@ const CheckoutPage = () => {
                   <button
                     onClick={handleCheckout}
                     disabled={checkoutLoading || isProcessing || !selectedAddress || (paymentMethod === 'card' && !cardToken)}
-                    className={`w-full mt-6 py-3 font-medium transition-all duration-300 ${
-                      checkoutLoading || isProcessing || !selectedAddress || (paymentMethod === 'card' && !cardToken)
+                    className={`w-full mt-6 py-3 font-medium transition-all duration-300 ${checkoutLoading || isProcessing || !selectedAddress || (paymentMethod === 'card' && !cardToken)
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-gray-900 text-white hover:bg-gray-800 hover:scale-105'
-                    }`}
+                      }`}
                     type="button"
                   >
                     {checkoutLoading || isProcessing ? (

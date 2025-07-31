@@ -98,22 +98,13 @@ const applyFiltersAndSort = (products: Product[], filters: ProductFilters, sort:
 // Async Thunks
 export const fetchProducts = createAsyncThunk(
   'products/fetch',
-  async ({ category, sort, page = 1, limit = 12 }: { category?: string; sort?: string; page?: number; limit?: number } = {}) => {
-    const response = await getProductsApi({ category, sort, page, limit });
-    // Handle both array response and paginated response
-    if (Array.isArray(response)) {
-      return {
-        products: response,
-        currentPage: 1,
-        totalPages: 1,
-        hasMore: false
-      };
-    }
+  async () => {
+    const response = await getProductsApi();
     return {
-      products: response.products || response,
-      currentPage: response.currentPage || page,
-      totalPages: response.totalPages || 1,
-      hasMore: response.hasMore || false
+      products: Array.isArray(response) ? response : response.products || response,
+      currentPage: 1,
+      totalPages: 1,
+      hasMore: false
     };
   }
 );
@@ -171,11 +162,7 @@ const productsSlice = createSlice({
     });
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
       state.isFetching = false;
-      if (action.meta.arg?.page === 1 || !action.meta.arg?.page) {
-        state.products = action.payload.products;
-      } else {
-        state.products = [...state.products, ...action.payload.products];
-      }
+      state.products = [...state.products, ...action.payload.products];
       state.currentPage = action.payload.currentPage;
       state.totalPages = action.payload.totalPages;
       state.hasMore = action.payload.hasMore;

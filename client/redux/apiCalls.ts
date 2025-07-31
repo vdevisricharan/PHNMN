@@ -183,13 +183,8 @@ export const setDefaultAddress = async (addressId: string) => {
 };
 
 // Product API Calls (Public)
-export const getProducts = async (params?: {
-  category?: string;
-  sort?: string;
-  page?: number;
-  limit?: number;
-}) => {
-  const res = await api.get('/api/products', { params });
+export const getProducts = async () => {
+  const res = await api.get('/api/products');
   return res.data;
 };
 

@@ -185,6 +185,8 @@ export default function ProductDetailPage() {
                             ? 'border-black shadow-lg'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
+                        type="button"
+                        title="Select this image"
                       >
                         <Image
                           src={img}

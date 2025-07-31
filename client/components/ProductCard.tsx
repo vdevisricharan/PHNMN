@@ -34,9 +34,8 @@ export default function ProductCard({ item }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  // Get authentication status and wishlist error
+  // Get authentication status
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
-  const { error: wishlistError } = useSelector((state: RootState) => state.wishlist);
 
   // Always call the hook (Rules of Hooks compliance)
   const rawProductStatus = useProductStatus(item._id);
@@ -95,7 +94,7 @@ export default function ProductCard({ item }: Props) {
     if (!item.sizes) return 'UNIVERSAL';
     if (typeof item.sizes === 'string') return item.sizes; // Handle UNIVERSAL size
     if (!item.stock) return item.sizes[0];
-    const availableSize = Object.entries(item.stock).find(([_, quantity]) => quantity > 0);
+    const availableSize = Object.entries(item.stock).find(([, quantity]) => quantity > 0);
     return availableSize ? availableSize[0] : item.sizes[0];
   };
 
@@ -156,15 +155,6 @@ export default function ProductCard({ item }: Props) {
           <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10">
             <span className="bg-red-500 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 font-medium">
               {item.discount || 0}% OFF
-            </span>
-          </div>
-        )}
-
-        {/* Stock Indicator */}
-        {!isInStock() && (
-          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10">
-            <span className="bg-gray-900 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 font-medium">
-              Out of Stock
             </span>
           </div>
         )}

@@ -29,7 +29,7 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
     
     // Fetch products first (available to everyone)
     if (!productsInitialized && !productsFetching) {
-      dispatch(fetchProducts({ limit: 100 }));
+      dispatch(fetchProducts());
     }
     
     // Only proceed with user-specific data if there's a token and user is not currently being fetched

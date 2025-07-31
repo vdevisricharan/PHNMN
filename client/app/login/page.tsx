@@ -18,7 +18,7 @@ interface ApiError {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   
   const { currentUser, isFetching } = useSelector((state: RootState) => state.user);

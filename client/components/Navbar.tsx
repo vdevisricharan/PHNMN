@@ -34,9 +34,6 @@ const Navbar = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  // Force re-render when user state changes
-  const userKey = currentUser ? currentUser._id : 'anonymous';
-
   const handleLogout = () => {
     dispatch(logoutAction());
     router.push("/");
@@ -128,7 +125,7 @@ const Navbar = () => {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent outline-none border-none text-sm placeholder-gray-500 w-32 sm:w-48 lg:w-64"
+                className="text-black bg-transparent outline-none border-none text-sm placeholder-gray-500 w-32 sm:w-48 lg:w-64"
                 placeholder="Search for items..."
                 type="text"
               />
@@ -278,13 +275,6 @@ const Navbar = () => {
                 </div>
               </Link>
 
-              <Link href="/wishlist" onClick={closeProfileModal}>
-                <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                  <FavoriteBorderOutlined className="text-gray-600" style={{ fontSize: 18 }} />
-                  <span className="text-sm text-gray-700">My Wishlist</span>
-                </div>
-              </Link>
-
               <Link href="/profile/addresses" onClick={closeProfileModal}>
                 <div className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
                   <LocationOnOutlined className="text-gray-600" style={{ fontSize: 18 }} />
@@ -383,28 +373,34 @@ const Navbar = () => {
                   <Link href="/profile" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <AccountCircleOutlined className="text-gray-600" />
-                      <span className="text-base text-gray-700">Profile</span>
+                      <span className="text-base text-gray-700">My Profile</span>
                     </div>
                   </Link>
 
                   <Link href="/profile/wallet" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <AccountBalanceWalletOutlined className="text-gray-600" />
-                      <span className="text-base text-gray-700">Wallet</span>
+                      <span className="text-base text-gray-700">My Wallet</span>
                     </div>
                   </Link>
 
                   <Link href="/profile/points" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <StarsOutlined className="text-gray-600" />
-                      <span className="text-base text-gray-700">Points</span>
+                      <span className="text-base text-gray-700">My Points</span>
                     </div>
                   </Link>
 
                   <Link href="/profile/orders" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <ListAltOutlined className="text-gray-600" />
-                      <span className="text-base text-gray-700">Orders</span>
+                      <span className="text-base text-gray-700">My Orders</span>
+                    </div>
+                  </Link>
+                  <Link href="/profile/addresses" onClick={closeMenu}>
+                    <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
+                      <LocationOnOutlined className="text-gray-600" />
+                      <span className="text-base text-gray-700">My Addresses</span>
                     </div>
                   </Link>
                 </>

@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { fetchOrder, cancelOrder, trackOrder, requestReturn } from '@/redux/slices/orderSlice';
+import { fetchOrder, cancelOrder, requestReturn } from '@/redux/slices/orderSlice';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -15,7 +15,6 @@ import {
   AssignmentReturnOutlined,
   LocationOnOutlined,
   AccessTimeOutlined,
-  ReceiptOutlined,
   PrintOutlined
 } from '@mui/icons-material';
 import Navbar from '@/components/Navbar';
@@ -24,7 +23,6 @@ import Footer from '@/components/Footer';
 const OrderDetailsPage = () => {
   const { id } = useParams();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { currentOrder, isFetching, error } = useSelector((state: RootState) => state.order);
   
@@ -204,7 +202,7 @@ const OrderDetailsPage = () => {
             
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 transition-colors text-sm font-medium"
+              className="flex items-center text-black gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-50 transition-colors text-sm font-medium"
               type="button"
             >
               <PrintOutlined style={{ fontSize: 16 }} />

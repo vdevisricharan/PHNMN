@@ -1,6 +1,5 @@
-//products/[id]/page.tsx
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -16,7 +15,6 @@ import Products from "@/components/Products";
 import Footer from "@/components/Footer";
 import type { ProductFilters, ProductSort } from "@/redux/types";
 
-// Updated colors from the products dump
 const COLORS = [
   "BLACK", "WHITE", "BLUE", "RED", "GREEN", "YELLOW", "BROWN", "GRAY", "IVORY",
   "DEEP-BLUE", "OLIVE-GREEN", "SAGE-GREEN", "CORAL", "PEARL", "DEEP-COCOA",
@@ -26,11 +24,10 @@ const COLORS = [
   "LIME-GREEN", "LAVENDER", "GRAPE-PURPLE"
 ];
 
-// Updated sizes from the products dump
 const SIZES = [
-  "XS", "S", "M", "L", "XL", "XXL",  // For clothes
-  "28", "30", "32", "34", "36", "38", // For pants
-  "UNIVERSAL" // For accessories
+  "XS", "S", "M", "L", "XL", "XXL",
+  "28", "30", "32", "34", "36", "38",
+  "UNIVERSAL"
 ];
 
 const PRICE_RANGES = [
@@ -53,8 +50,8 @@ export default function ProductsPage() {
   
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Helper function to get sort value from Redux
-  const getSortValueFromRedux = () => {
+  // Helper function to get sort string value from Redux
+  const getSortStringFromRedux = useCallback(() => {
     if (!sort) return 'newest';
     
     if (sort.field === 'price') {
@@ -62,19 +59,27 @@ export default function ProductsPage() {
     } else if (sort.field === 'rating') {
       return 'rating-desc';
     } else if (sort.field === 'name') {
-      return 'name-asc';
+      return sort.direction === 'asc' ? 'name-asc' : 'name-desc';
     }
     
     return 'newest';
-  };
+  }, [sort]);
 
-  // Memoize empty filters to prevent unnecessary re-renders
-  const emptyFilters = useMemo(() => ({}), []);
-  
-  // Memoize sort value to prevent unnecessary re-renders
-  const sortValue = useMemo(() => getSortValueFromRedux(), [sort]);
+  // Initialize filters with category on mount
+  useEffect(() => {
+    if (category && !searchQuery) {
+      // Set category filter if not already set
+      if (!filters.category?.includes(category)) {
+        const newFilters: ProductFilters = {
+          ...filters,
+          category: [category]
+        };
+        dispatch(setFilters(newFilters));
+      }
+    }
+  }, [dispatch, category, searchQuery, filters]);
 
-  // Initialize search on mount
+  // FIXED: Initialize search on mount
   useEffect(() => {
     if (searchQuery) {
       dispatch(searchProducts(searchQuery));
@@ -139,6 +144,9 @@ export default function ProductsPage() {
       case 'name-asc':
         sortConfig = { field: 'name', direction: 'asc' };
         break;
+      case 'name-desc':
+        sortConfig = { field: 'name', direction: 'desc' };
+        break;
       case 'newest':
       default:
         sortConfig = { field: 'createdAt', direction: 'desc' };
@@ -150,9 +158,24 @@ export default function ProductsPage() {
 
   const clearAllFilters = () => {
     dispatch(clearFilters());
+    // Re-apply category filter if we're on a category page
+    if (category && !searchQuery) {
+      setTimeout(() => {
+        dispatch(setFilters({ category: [category] }));
+      }, 0);
+    }
   };
 
-  const hasActiveFilters = Object.keys(filters).length > 0;
+  const hasActiveFilters = useMemo(() => {
+    const filterKeys = Object.keys(filters);
+    // Don't count category as an "active" filter since it's automatic
+    return filterKeys.some(key => 
+      key !== 'category' && 
+      filters[key as keyof ProductFilters] !== undefined &&
+      filters[key as keyof ProductFilters] !== null &&
+      (!Array.isArray(filters[key as keyof ProductFilters]) || (filters[key as keyof ProductFilters] as string[]).length > 0)
+    );
+  }, [filters]);
 
   // Get available sizes based on category
   const getAvailableSizes = () => {
@@ -318,7 +341,7 @@ export default function ProductsPage() {
                     <select
                       onChange={e => handleSortChange(e.target.value)}
                       className="w-full appearance-none bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 px-4 py-3 pr-10 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200"
-                      value={getSortValueFromRedux()}
+                      value={getSortStringFromRedux()}
                       title="Sort products"
                     >
                       <option value="newest">✨ Newest First</option>
@@ -326,6 +349,7 @@ export default function ProductsPage() {
                       <option value="price-desc">💎 Price: High to Low</option>
                       <option value="rating-desc">⭐ Best Rated</option>
                       <option value="name-asc">🔤 Name: A to Z</option>
+                      <option value="name-desc">🔤 Name: Z to A</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                       <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,12 +362,10 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Products Component */}
+          {/* FIXED: Products Component - Let it manage its own state through Redux */}
           <div className="transition-all duration-300 ease-in-out">
             <Products 
-              category={searchQuery ? undefined : category} 
-              filters={emptyFilters} 
-              sort={sortValue}
+              category={searchQuery ? undefined : category}
             />
           </div>
         </div>
