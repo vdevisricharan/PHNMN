@@ -4,7 +4,8 @@ import {
   getCart as getCartApi,
   addToCart as addToCartApi,
   updateCartItem as updateCartItemApi,
-  removeFromCart as removeFromCartApi
+  removeFromCart as removeFromCartApi,
+  clearCart as clearCartApi
 } from '../apiCalls';
 
 const initialState: CartState = {
@@ -57,6 +58,13 @@ export const removeFromCart = createAsyncThunk(
   async (productId: string) => {
     await removeFromCartApi(productId);
     return productId;
+  }
+);
+
+export const clearCartAPI = createAsyncThunk(
+  'cart/clear',
+  async () => {
+    await clearCartApi();
   }
 );
 
@@ -198,6 +206,22 @@ const cartSlice = createSlice({
     builder.addCase(removeFromCart.rejected, (state, action) => {
       state.isFetching = false;
       state.error = action.error.message || 'Failed to remove item from cart';
+    });
+    // Clear Cart
+    builder.addCase(clearCartAPI.pending, (state) => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(clearCartAPI.fulfilled, (state) => {
+      state.isFetching = false;
+      state.items = [];
+      state.quantity = 0;
+      state.total = 0;
+      state.error = null;
+    });
+    builder.addCase(clearCartAPI.rejected, (state, action) => {
+      state.isFetching = false;
+      state.error = action.error.message || 'Failed to clear cart';
     });
   },
 });

@@ -1,25 +1,16 @@
-
 'use client';
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { setFilters, setSort, clearFilters } from "@/redux/slices/productsSlice";
-import type { ProductFilters, ProductSort } from "@/redux/types";
+import { clearFilters } from "@/redux/slices/productsSlice";
 
 type ProductsProps = {
   category?: string;
-  filters?: {
-    sizes?: string[];
-    colors?: string[];
-    minPrice?: number;
-    maxPrice?: number;
-  };
-  sort?: 'newest' | 'price-asc' | 'price-desc' | 'rating-desc' | 'name-asc' | 'name-desc';
 };
 
-const Products = ({ category, filters: propFilters = {}, sort: propSort = "newest" }: ProductsProps) => {
+const Products = ({ category }: ProductsProps) => {
   const [isHydrated, setIsHydrated] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   
@@ -32,80 +23,9 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
     error 
   } = useSelector((state: RootState) => state.products);
 
-  // Memoize the filters to prevent unnecessary re-renders
-  const memoizedFilters = useMemo(() => {
-    return propFilters;
-  }, [propFilters]);
-
-  // Memoize the sort value
-  const memoizedSort = useMemo(() => {
-    return propSort;
-  }, [propSort]);
-
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-
-  // Apply filters from props when they change
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    const newFilters: ProductFilters = {};
-    
-    if (category) {
-      newFilters.category = [category];
-    }
-    
-    if (memoizedFilters.colors && memoizedFilters.colors.length > 0) {
-      newFilters.colors = memoizedFilters.colors;
-    }
-    
-    if (memoizedFilters.sizes && memoizedFilters.sizes.length > 0) {
-      newFilters.sizes = memoizedFilters.sizes;
-    }
-    
-    if (memoizedFilters.minPrice !== undefined || memoizedFilters.maxPrice !== undefined) {
-      newFilters.priceRange = {
-        min: memoizedFilters.minPrice || 0,
-        max: memoizedFilters.maxPrice || 999999
-      };
-    }
-
-    // Only dispatch if filters have actually changed
-    const filtersChanged = JSON.stringify(newFilters) !== JSON.stringify(reduxFilters);
-    if (filtersChanged) {
-      dispatch(setFilters(newFilters));
-    }
-  }, [dispatch, category, memoizedFilters, reduxFilters, isHydrated]);
-
-  // Apply sort from props when it changes
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    let sortConfig: ProductSort;
-    
-    switch (memoizedSort) {
-      case 'price-asc':
-        sortConfig = { field: 'price', direction: 'asc' };
-        break;
-      case 'price-desc':
-        sortConfig = { field: 'price', direction: 'desc' };
-        break;
-      case 'rating-desc':
-        sortConfig = { field: 'rating', direction: 'desc' };
-        break;
-      case 'newest':
-      default:
-        sortConfig = { field: 'createdAt', direction: 'desc' };
-        break;
-    }
-
-    // Only dispatch if sort has actually changed
-    const sortChanged = JSON.stringify(sortConfig) !== JSON.stringify(reduxSort);
-    if (sortChanged) {
-      dispatch(setSort(sortConfig));
-    }
-  }, [dispatch, memoizedSort, reduxSort, isHydrated]);
 
   // Show loading during hydration or when products are not yet loaded
   if (!isHydrated || (products.length === 0 && isFetching)) {
@@ -127,10 +47,12 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
     );
   }
 
-  // Use filtered products from Redux store, or fallback to featured products for homepage
-  const displayProducts = category 
-    ? filteredProducts 
-    : filteredProducts.filter(p => p.isFeatured).slice(0, 8);
+  // FIXED: Use filtered products from Redux store
+  // For homepage (no category), show featured products
+  // For category pages, show all filtered products
+  const displayProducts = !category 
+    ? filteredProducts.filter(p => p.isFeatured).slice(0, 8)
+    : filteredProducts;
 
   return (
     <section className="py-8 sm:py-12 lg:py-16 xl:py-20">
@@ -151,6 +73,19 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
         {category && Object.keys(reduxFilters).length > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-gray-600">Active filters:</span>
+            
+            {/* Category Filter (usually automatic, but show if present) */}
+            {reduxFilters.category?.map(cat => (
+              <span
+                key={`category-${cat}`}
+                className="inline-flex items-center gap-2 bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1"
+              >
+                <span>Category:</span>
+                <span className="font-semibold">{cat}</span>
+              </span>
+            ))}
+            
+            {/* Color Filters */}
             {reduxFilters.colors?.map(color => (
               <span
                 key={`color-${color}`}
@@ -160,23 +95,43 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
                 <span className="font-semibold">{color.replace(/-/g, ' ')}</span>
               </span>
             ))}
+            
+            {/* Size Filters */}
             {reduxFilters.sizes?.map(size => (
               <span
                 key={`size-${size}`}
-                className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1"
+                className="inline-flex items-center gap-2 bg-green-100 text-green-800 text-sm font-medium px-3 py-1"
               >
                 <span>Size:</span>
                 <span className="font-semibold">{size}</span>
               </span>
             ))}
+            
+            {/* Price Range Filter */}
             {reduxFilters.priceRange && (
-              <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1">
+              <span className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1">
                 <span>Price:</span>
                 <span className="font-semibold">
                   ₹{reduxFilters.priceRange.min.toLocaleString()} - ₹{reduxFilters.priceRange.max.toLocaleString()}
                 </span>
               </span>
             )}
+            
+            {/* Rating Filter */}
+            {reduxFilters.rating && (
+              <span className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1">
+                <span>Rating:</span>
+                <span className="font-semibold">{reduxFilters.rating}+ ⭐</span>
+              </span>
+            )}
+            
+            {/* In Stock Filter */}
+            {reduxFilters.inStock && (
+              <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-sm font-medium px-3 py-1">
+                <span className="font-semibold">In Stock Only</span>
+              </span>
+            )}
+            
             <button
               onClick={() => dispatch(clearFilters())}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
@@ -184,6 +139,19 @@ const Products = ({ category, filters: propFilters = {}, sort: propSort = "newes
             >
               Clear all filters
             </button>
+          </div>
+        )}
+
+        {/* Sort Summary */}
+        {category && reduxSort && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
+            <span>Sorted by:</span>
+            <span className="font-medium">
+              {reduxSort.field === 'price' && `Price (${reduxSort.direction === 'asc' ? 'Low to High' : 'High to Low'})`}
+              {reduxSort.field === 'rating' && 'Best Rated'}
+              {reduxSort.field === 'name' && `Name (${reduxSort.direction === 'asc' ? 'A to Z' : 'Z to A'})`}
+              {reduxSort.field === 'createdAt' && 'Newest First'}
+            </span>
           </div>
         )}
         

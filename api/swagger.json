@@ -19,7 +19,7 @@
       "description": "Development server"
     },
     {
-      "url": "https://api.phnmn.com/api",
+      "url": "https://phnmn.onrender.com/api",
       "description": "Production server"
     }
   ],

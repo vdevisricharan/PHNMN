@@ -160,15 +160,6 @@ export default function ProductCard({ item }: Props) {
           </div>
         )}
 
-        {/* Stock Indicator */}
-        {!isInStock() && (
-          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10">
-            <span className="bg-gray-900 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 font-medium">
-              Out of Stock
-            </span>
-          </div>
-        )}
-
         {/* Desktop Action Buttons */}
         <div className="hidden sm:flex absolute top-2 sm:top-3 right-2 sm:right-3 flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
           <button
