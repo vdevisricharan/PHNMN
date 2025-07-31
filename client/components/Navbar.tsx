@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { 
-  Search, 
-  ShoppingCartOutlined, 
-  PersonOutlined, 
-  MenuOutlined, 
+import {
+  ShoppingCartOutlined,
+  PersonOutlined,
+  MenuOutlined,
   CloseOutlined,
   FavoriteBorderOutlined,
   LogoutOutlined,
@@ -24,11 +23,9 @@ import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [hasMounted, setHasMounted] = useState(false);
-  
+
   const quantity = useSelector((state: RootState) => state.cart.quantity);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const router = useRouter();
@@ -39,15 +36,6 @@ const Navbar = () => {
     router.push("/");
     setIsMenuOpen(false);
     setIsProfileModalOpen(false);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchOpen(false);
-      setSearchQuery('');
-    }
   };
 
   const toggleMenu = () => {
@@ -83,7 +71,7 @@ const Navbar = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
-    
+
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -117,20 +105,17 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Left Section - Search (Desktop) */}
+        {/* Left Section - (Desktop) */}
         <div className="hidden md:flex flex-1 items-center space-x-6">
-          <form onSubmit={handleSearch} className="relative">
-            <div className="flex items-center bg-gray-50 hover:bg-gray-100 transition-colors duration-200 px-4 py-2 border border-gray-200 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-200">
-              <Search className="text-gray-400 mr-2" style={{ fontSize: 20 }} />
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-black bg-transparent outline-none border-none text-sm placeholder-gray-500 w-32 sm:w-48 lg:w-64"
-                placeholder="Search for items..."
-                type="text"
-              />
-            </div>
-          </form>
+          <Link href="/products/TOP-WEAR" className="text-gray-900 text-sm tracking-wide">
+            TOP-WEAR
+          </Link>
+          <Link href="/products/BOTTOM-WEAR" className="text-gray-900 text-sm tracking-wide">
+            BOTTOM-WEAR
+          </Link>
+          <Link href="/products/ACCESSORIES" className="text-gray-900 text-sm tracking-wide">
+            ACCESSORIES
+          </Link>
         </div>
 
         {/* Center Section - Logo */}
@@ -144,16 +129,6 @@ const Navbar = () => {
 
         {/* Right Section */}
         <div className="flex items-center space-x-2 md:space-x-6 flex-1 justify-end">
-          {/* Mobile Search Button */}
-          <button
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="md:hidden p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200"
-            aria-label="Search"
-            type="button"
-          >
-            <Search style={{ fontSize: 22 }} />
-          </button>
-
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {hasMounted && currentUser ? (
@@ -164,7 +139,7 @@ const Navbar = () => {
                     <FavoriteBorderOutlined style={{ fontSize: 22 }} />
                   </div>
                 </Link>
-                
+
                 {/* Profile Avatar */}
                 <div className="relative">
                   <button
@@ -204,15 +179,15 @@ const Navbar = () => {
                     }
                   }}
                 >
-                  <ShoppingCartOutlined 
-                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200" 
-                    style={{ fontSize: 22 }} 
+                  <ShoppingCartOutlined
+                    className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                    style={{ fontSize: 22 }}
                   />
                 </Badge>
               ) : (
-                <ShoppingCartOutlined 
-                  className="text-gray-700 hover:text-gray-900 transition-colors duration-200" 
-                  style={{ fontSize: 22 }} 
+                <ShoppingCartOutlined
+                  className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
+                  style={{ fontSize: 22 }}
                 />
               )}
             </div>
@@ -225,7 +200,7 @@ const Navbar = () => {
         <>
           {/* Backdrop */}
           <div className="fixed inset-0 bg-black/20 z-40" />
-          
+
           {/* Modal */}
           <div className="profile-modal fixed top-20 right-4 lg:right-8 w-64 bg-white shadow-2xl border border-gray-200 z-50 py-2">
             {/* User Info Header */}
@@ -287,6 +262,7 @@ const Navbar = () => {
 
               <button
                 onClick={handleLogout}
+                type="button"
                 className="flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors w-full text-left"
               >
                 <LogoutOutlined className="text-red-600" style={{ fontSize: 18 }} />
@@ -297,42 +273,15 @@ const Navbar = () => {
         </>
       )}
 
-      {/* Mobile Search Overlay */}
-      {isSearchOpen && (
-        <div className="md:hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-40 p-4">
-          <form onSubmit={handleSearch} className="relative">
-            <div className="flex items-center bg-gray-50 px-4 py-3 border border-gray-200 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-200">
-              <Search className="text-gray-400 mr-3" style={{ fontSize: 20 }} />
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent outline-none border-none text-base placeholder-gray-500 flex-1"
-                placeholder="Search for items..."
-                type="text"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(false)}
-                className="ml-2 text-gray-400 hover:text-gray-600"
-                title="Close search"
-              >
-                <CloseOutlined style={{ fontSize: 20 }} />
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <>
           {/* Backdrop */}
-          <div 
+          <div
             className="md:hidden fixed inset-0 bg-black/50 z-40"
             onClick={closeMenu}
           />
-          
+
           {/* Menu Panel */}
           <div className="md:hidden fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 shadow-2xl transform transition-transform duration-300">
             {/* Menu Header */}
@@ -369,7 +318,7 @@ const Navbar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <Link href="/profile" onClick={closeMenu}>
                     <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
                       <AccountCircleOutlined className="text-gray-600" />

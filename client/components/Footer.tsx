@@ -3,13 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import {
-    Facebook,
+    // Facebook,
     Instagram,
     MailOutline,
     Phone,
     Room,
-    Twitter,
-    YouTube,
+    // Twitter,
+    // YouTube,
 } from "@mui/icons-material";
 import payment from "../assets/payments.png";
 import Image from "next/image";
@@ -28,19 +28,30 @@ const Footer = () => (
                     <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
                         Redefining Fashion. Discover the latest trends and timeless styles with our curated collections. Elevate your wardrobe and express your unique style.
                     </p>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                        Follow us on social media for the latest updates and exclusive offers.
+                    </p>
                     <div className="flex space-x-3 sm:space-x-4">
-                        <span className="w-9 h-9 sm:w-10 sm:h-10  bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer">
-                            <Facebook fontSize="small" />
-                        </span>
-                        <span className="w-9 h-9 sm:w-10 sm:h-10  bg-pink-600 text-white flex items-center justify-center hover:bg-pink-700 transition-colors cursor-pointer">
-                            <Instagram fontSize="small" />
-                        </span>
-                        <span className="w-9 h-9 sm:w-10 sm:h-10  bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
-                            <Twitter fontSize="small" />
-                        </span>
-                        <span className="w-9 h-9 sm:w-10 sm:h-10  bg-red-700 text-white flex items-center justify-center hover:bg-red-800 transition-colors cursor-pointer">
-                            <YouTube fontSize="small" />
-                        </span>
+                        {/* <Link href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
+                            <span className="w-9 h-9 sm:w-10 sm:h-10  bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors cursor-pointer">
+                                <Facebook fontSize="small" />
+                            </span>
+                        </Link> */}
+                        <Link href="https://www.instagram.com/phnmnfashion/" target="_blank" rel="noopener noreferrer">
+                            <span className="w-9 h-9 sm:w-10 sm:h-10  bg-pink-600 text-white flex items-center justify-center hover:bg-pink-700 transition-colors cursor-pointer">
+                                <Instagram fontSize="small" />
+                            </span>
+                        </Link>
+                        {/* <Link href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
+                            <span className="w-9 h-9 sm:w-10 sm:h-10  bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition-colors cursor-pointer">
+                                <Twitter fontSize="small" />
+                            </span>
+                        </Link> */}
+                        {/* <Link href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
+                            <span className="w-9 h-9 sm:w-10 sm:h-10  bg-red-700 text-white flex items-center justify-center hover:bg-red-800 transition-colors cursor-pointer">
+                                <YouTube fontSize="small" />
+                            </span>
+                        </Link> */}
                     </div>
                 </div>
 

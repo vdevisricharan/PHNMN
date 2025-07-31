@@ -38,6 +38,7 @@ const WalletPage = () => {
       return;
     }
     await dispatch(addWalletMoney(Number(amount)));
+    await dispatch(fetchWalletTransactions({ page: 1, limit: 10 }));
     setAmount('');
     setShowAddMoneyModal(false);
   };
@@ -167,7 +168,7 @@ const WalletPage = () => {
                   id="amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter amount"
                   min="1"
                 />
