@@ -1,3 +1,4 @@
+//ProductCard.tsx
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -14,7 +15,7 @@ import {
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { addToCart, addToCartOptimistic, updateCartItem, updateCartItemOptimistic } from "@/redux/slices/cartSlice";
+import { addToCart, addToCartOptimistic, removeFromCart, removeFromCartOptimistic, updateCartItem, updateCartItemOptimistic } from "@/redux/slices/cartSlice";
 import {
   addToWishlist,
   removeFromWishlist,
@@ -136,6 +137,35 @@ export default function ProductCard({ item }: Props) {
     }
   };
 
+  const handleRemoveFromCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cartItem) {
+      dispatch(removeFromCartOptimistic({ 
+        productId: item._id, 
+        size: cartItem.size, 
+        color: cartItem.color 
+      }));
+      dispatch(removeFromCart(item._id));
+    }
+  };
+
+  // Handle decrease quantity - remove from cart if quantity is 1
+  const handleDecreaseQuantity = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!cartItem) return;
+    
+    if (cartItem.quantity === 1) {
+      // Remove from cart if quantity is 1
+      handleRemoveFromCart(e);
+    } else {
+      // Decrease quantity
+      handleUpdateQuantity(e, cartItem.quantity - 1);
+    }
+  };
+
   const discountedPrice = item.price - (item.price * ((item.discount || 0) / 100));
 
   return (
@@ -185,24 +215,23 @@ export default function ProductCard({ item }: Props) {
 
         {/* Desktop Quick Add to Cart / Quantity Controls */}
         <div className="hidden sm:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-          {isInCart ? (
+          {isInCart && cartItem ? (
             // Show quantity controls if item is in cart
             <div className="flex items-center justify-between bg-gray-900/95 backdrop-blur-sm text-white py-2 sm:py-2.5 lg:py-3 px-3 shadow-md">
               <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
-                onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
-                disabled={(cartItem?.quantity || 1) <= 1}
+                onClick={handleDecreaseQuantity}
                 type="button"
-                title="Decrease Quantity"
+                title={cartItem.quantity === 1 ? "Remove from Cart" : "Decrease Quantity"}
               >
                 <RemoveOutlined className="text-[16px]" />
               </button>
               <span className="font-medium text-sm lg:text-base">
-                {cartItem?.quantity || 0} in cart
+                {cartItem.quantity} in cart
               </span>
               <button
                 className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
-                onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
+                onClick={(e) => handleUpdateQuantity(e, cartItem.quantity + 1)}
                 disabled={!isInStock()}
                 type="button"
                 title="Increase Quantity"
@@ -274,23 +303,22 @@ export default function ProductCard({ item }: Props) {
             )}
           </button>
 
-          {isInCart ? (
+          {isInCart && cartItem ? (
             <div className="flex-1 flex items-center justify-between bg-gray-900 text-white py-2 px-3">
               <button
-                className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
-                onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 1) - 1)}
-                disabled={(cartItem?.quantity || 1) <= 1}
+                className="flex items-center justify-center hover:bg-gray-700 transition-colors"
+                onClick={handleDecreaseQuantity}
                 type="button"
-                title="Decrease Quantity"
+                title={cartItem.quantity === 1 ? "Remove from Cart" : "Decrease Quantity"}
               >
                 <RemoveOutlined className="text-[16px]" />
               </button>
               <span className="font-medium text-sm">
-                {cartItem?.quantity || 0}
+                {cartItem.quantity}
               </span>
               <button
-                className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 transition-colors"
-                onClick={(e) => handleUpdateQuantity(e, (cartItem?.quantity || 0) + 1)}
+                className="flex items-center justify-center hover:bg-gray-700 transition-colors"
+                onClick={(e) => handleUpdateQuantity(e, cartItem.quantity + 1)}
                 disabled={!isInStock()}
                 type="button"
                 title="Increase Quantity"
@@ -300,12 +328,11 @@ export default function ProductCard({ item }: Props) {
             </div>
           ) : (
             <button
-              className="flex-1 py-2 px-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 text-sm"
+              className="w-10 h-10 flex-1 py-2 px-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2 text-sm"
               onClick={handleAddToCart}
               disabled={!isInStock()}
               type="button"
             >
-              <ShoppingCartOutlined className="text-[16px]" />
               <span>Add to Cart</span>
             </button>
           )}

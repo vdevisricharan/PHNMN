@@ -56,8 +56,8 @@ export default function CartPage() {
       <main className="bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
           {/* Header - Fully responsive */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
-            <div className="order-2 sm:order-1">
+          <div className="flex flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 space-y-0">
+            <div className="order-1">
               <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
                 <ArrowBackOutlined className="mr-2 text-lg sm:text-xl" />
               </Link>
@@ -142,9 +142,15 @@ export default function CartPage() {
                                     onClick={
                                       () => 
                                         {
-                                          dispatch(updateCartItemOptimistic({ productId: item.productId._id, quantity: item.quantity - 1 }));
-                                          dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity - 1 }))
-                                        }}
+                                          if (item.quantity > 1) {
+                                            dispatch(updateCartItemOptimistic({ productId: item.productId._id, quantity: item.quantity - 1 }));
+                                            dispatch(updateCartItem({ productId: item.productId._id, quantity: item.quantity - 1 }));
+                                          } else {
+                                            dispatch(removeFromCartOptimistic({ productId: item.productId._id }));
+                                            dispatch(removeFromCart(item.productId._id));
+                                          }
+                                        }
+                                    }
                                     aria-label="Decrease quantity"
                                     type="button"
                                   >

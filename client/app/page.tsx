@@ -13,7 +13,9 @@ export default function Home() {
       <Navbar />
       <Slider />
       <Categories />
-      <Products />
+      <div className="px-4 sm:px-6 lg:px-8">
+        <Products />
+      </div>
       <Newsletter />
       <Footer />
     </div>

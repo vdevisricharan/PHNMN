@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   AccountCircleOutlined,
@@ -7,7 +7,8 @@ import {
   LocationOnOutlined,
   StarsOutlined,
   EditOutlined,
-  ChevronRightOutlined
+  ChevronRightOutlined,
+  CloseOutlined
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -15,12 +16,136 @@ import { fetchOrders } from '@/redux/slices/orderSlice';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+// Edit Profile Modal Component
+const EditProfileModal = ({ isOpen, onClose, currentUser, onSave }) => {
+  const [formData, setFormData] = useState({
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
+    dateOfBirth: currentUser?.dateOfBirth ? new Date(currentUser.dateOfBirth).toISOString().split('T')[0] : ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white  max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            title='Close Modal'
+            type='button'
+          >
+            <CloseOutlined />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="space-y-4 text-black">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter phone number"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                id="dateOfBirth"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200  transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-700  transition-colors"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { currentUser, isFetching: userFetching, isAuthenticated } = useSelector((state: RootState) => state.user);
   const { balance: walletBalance = 0, isFetching: walletFetching } = useSelector((state: RootState) => state.wallet || {});
   const { balance: pointsBalance = 0, isFetching: pointsFetching } = useSelector((state: RootState) => state.points || {});
   const { orders = [], isFetching: ordersFetching, hasInitialized: ordersInitialized } = useSelector((state: RootState) => state.order || {});
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     // Only fetch orders if user is authenticated and orders not already initialized and not currently fetching
@@ -28,6 +153,13 @@ const ProfilePage = () => {
       dispatch(fetchOrders({ page: 1, limit: 5 })); // Fetch only 5 recent orders
     }
   }, [dispatch, isAuthenticated, ordersInitialized, ordersFetching]);
+
+  const handleSaveProfile = (updatedData) => {
+    // Here you would dispatch an action to update the user profile
+    // dispatch(updateUserProfile(updatedData));
+    console.log('Updated profile data:', updatedData);
+    // You can add your API call or Redux action here
+  };
 
   if (!currentUser || userFetching) {
     return (
@@ -55,13 +187,13 @@ const ProfilePage = () => {
                     <p className="text-gray-600">{currentUser.email}</p>
                   </div>
                 </div>
-                <Link
-                  href="/profile/edit"
-                  className="text-blue-600 hover:text-blue-800 flex items-center text-sm font-medium"
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="text-blue-600 hover:text-blue-800 flex items-center text-sm font-medium transition-colors"
                 >
                   <EditOutlined className="w-4 h-4 mr-1" />
                   Edit Profile
-                </Link>
+                </button>
               </div>
 
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -201,6 +333,13 @@ const ProfilePage = () => {
           </div>
         </div>
       </main>
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentUser={currentUser}
+        onSave={handleSaveProfile}
+      />
       <Footer />
     </>
   );

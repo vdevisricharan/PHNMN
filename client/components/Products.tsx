@@ -47,7 +47,6 @@ const Products = ({ category }: ProductsProps) => {
     );
   }
 
-  // FIXED: Use filtered products from Redux store
   // For homepage (no category), show featured products
   // For category pages, show all filtered products
   const displayProducts = !category 
@@ -56,7 +55,7 @@ const Products = ({ category }: ProductsProps) => {
 
   return (
     <section className="py-8 sm:py-12 lg:py-16 xl:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container mx-auto max-w-7xl">
         {/* Header Section */}
         {!category && (
           <div className="text-center mb-8 sm:mb-12 lg:mb-16">

@@ -108,10 +108,10 @@ const Navbar = () => {
         {/* Left Section - (Desktop) */}
         <div className="hidden md:flex flex-1 items-center space-x-6">
           <Link href="/products/TOP-WEAR" className="text-gray-900 text-sm tracking-wide">
-            TOP-WEAR
+            TOP WEAR
           </Link>
           <Link href="/products/BOTTOM-WEAR" className="text-gray-900 text-sm tracking-wide">
-            BOTTOM-WEAR
+            BOTTOM WEAR
           </Link>
           <Link href="/products/ACCESSORIES" className="text-gray-900 text-sm tracking-wide">
             ACCESSORIES
@@ -352,6 +352,12 @@ const Navbar = () => {
                       <span className="text-base text-gray-700">My Addresses</span>
                     </div>
                   </Link>
+                  <Link href="/wishlist" onClick={closeMenu}>
+                    <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
+                      <FavoriteBorderOutlined className="text-gray-600" />
+                      <span className="text-base text-gray-700">Wishlist</span>
+                    </div>
+                  </Link>
                 </>
               ) : (
                 <Link href="/login" onClick={closeMenu}>
@@ -361,13 +367,6 @@ const Navbar = () => {
                   </div>
                 </Link>
               )}
-
-              <Link href="/wishlist" onClick={closeMenu}>
-                <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">
-                  <FavoriteBorderOutlined className="text-gray-600" />
-                  <span className="text-base text-gray-700">Wishlist</span>
-                </div>
-              </Link>
 
               <Link href="/cart" onClick={closeMenu}>
                 <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 transition-colors">

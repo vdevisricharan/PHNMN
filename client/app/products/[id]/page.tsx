@@ -79,7 +79,7 @@ export default function ProductsPage() {
     }
   }, [dispatch, category, searchQuery, filters]);
 
-  // FIXED: Initialize search on mount
+  // Initialize search on mount
   useEffect(() => {
     if (searchQuery) {
       dispatch(searchProducts(searchQuery));
@@ -362,7 +362,6 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* FIXED: Products Component - Let it manage its own state through Redux */}
           <div className="transition-all duration-300 ease-in-out">
             <Products 
               category={searchQuery ? undefined : category}

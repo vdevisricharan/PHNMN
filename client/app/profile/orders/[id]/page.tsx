@@ -168,7 +168,9 @@ const OrderDetailsPage = () => {
               {error || 'The order you are looking for does not exist or you do not have access to it.'}
             </p>
             <Link href="/profile/orders">
-              <button className="px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors">
+              <button className="px-6 py-3 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-colors"
+              type="button"
+              >
                 Back to Orders
               </button>
             </Link>
@@ -452,7 +454,7 @@ const OrderDetailsPage = () => {
                           <select
                             value={returnItem?.quantity || 0}                  
                             onChange={(e) => updateReturnItem(item.productId._id, 'quantity', Number(e.target.value))}
-                            className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-black border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             title='Select quantity to return'
                           >
                             <option value={0}>Don&apos;t return</option>
@@ -469,7 +471,7 @@ const OrderDetailsPage = () => {
                           <select
                             value={returnItem?.reason || ''}
                             onChange={(e) => updateReturnItem(item.productId._id, 'reason', e.target.value)}
-                            className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-black border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             disabled={!returnItem?.quantity}
                             title='Select reason for return'
                           >
@@ -494,7 +496,7 @@ const OrderDetailsPage = () => {
                   <textarea
                     value={returnReason}
                     onChange={(e) => setReturnReason(e.target.value)}
-                    className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-black border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Please provide additional details about your return request..."
                   />

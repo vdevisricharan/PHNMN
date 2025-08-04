@@ -8,7 +8,8 @@ import {
   DeleteOutlined,
   HomeOutlined,
   BusinessOutlined,
-  LocalShippingOutlined
+  LocalShippingOutlined,
+  CloseOutlined
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -109,10 +110,15 @@ const AddressesPage = () => {
     }
   };
 
+  const closeModal = () => {
+    setShowAddForm(false);
+    setEditingAddress(null);
+  };
+
   if (isFetching && addresses.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin  h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+        <div className="animate-spin h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -132,7 +138,7 @@ const AddressesPage = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-4  mb-6">
+            <div className="bg-red-50 text-red-600 p-4 mb-6">
               {error}
               <button
                 onClick={() => dispatch(clearError())}
@@ -236,189 +242,200 @@ const AddressesPage = () => {
 
           {/* Add/Edit Address Form Modal */}
           {showAddForm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white shadow-xl w-full max-w-lg">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto">
+              <div className="bg-white shadow-xl w-full max-w-md sm:max-w-lg mx-auto my-4 sm:my-8 min-h-0 max-h-[calc(100vh-2rem)] flex flex-col">
+                {/* Header - Fixed */}
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                     {editingAddress ? 'Edit Address' : 'Add New Address'}
                   </h2>
+                  <button
+                    onClick={closeModal}
+                    className="p-1 hover:bg-gray-100  transition-colors"
+                    type="button"
+                    aria-label="Close modal"
+                  >
+                    <CloseOutlined className="text-gray-500" />
+                  </button>
                 </div>
-                <form onSubmit={handleSubmit} className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Address Type
-                      </label>
-                      <select
-                        value={formData.type}
-                        onChange={(e) => setFormData({ ...formData, type: e.target.value as 'home' | 'office' | 'other' })}
-                        className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title='Select address type'
+
+                {/* Form Content - Scrollable */}
+                <div className="flex-1 overflow-y-auto">
+                  <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+                    <div className="space-y-4 sm:space-y-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Address Type
+                        </label>
+                        <select
+                          value={formData.type}
+                          onChange={(e) => setFormData({ ...formData, type: e.target.value as 'home' | 'office' | 'other' })}
+                          className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          title='Select address type'
+                        >
+                          <option value="home">Home</option>
+                          <option value="office">Office</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.fullName}
+                          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                          className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          title='Full Name'
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          title='Phone Number'
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Street Address
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.street}
+                          onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                          className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          title='Street Address'
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Locality/Area
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.locality}
+                          onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
+                          className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          title='Locality/Area'
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            City
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.city}
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            title="City"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            State
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                            className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            title="State"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Postal Code
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.postalCode}
+                            onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                            className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            title='Postal Code'
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Country
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.country}
+                            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                            className="w-full px-3 py-2.5 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            title="Country"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="isDefault"
+                          checked={formData.isDefault}
+                          onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300  mt-0.5"
+                        />
+                        <label htmlFor="isDefault" className="ml-3 block text-sm text-gray-900 leading-5">
+                          Set as default address
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Form Actions - Fixed at bottom */}
+                    <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                      <button
+                        onClick={closeModal}
+                        className="w-full sm:w-auto px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium disabled:text-gray-400 border border-gray-300  hover:bg-gray-50 transition-colors"
+                        type="button"
+                        disabled={isFetching}
                       >
-                        <option value="home">Home</option>
-                        <option value="office">Office</option>
-                        <option value="other">Other</option>
-                      </select>
+                        Cancel
+                      </button>
+                      <button
+                        className="w-full sm:w-auto px-4 py-2.5 bg-gray-900 text-white font-medium hover:bg-gray-800 disabled:bg-gray-400  transition-colors"
+                        type="submit"
+                        disabled={isFetching}
+                      >
+                        {isFetching ? (
+                          <span className="flex items-center justify-center">
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent  animate-spin mr-2"></span>
+                            Saving...
+                          </span>
+                        ) : (
+                          editingAddress ? 'Update Address' : 'Save Address'
+                        )}
+                      </button>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title='Full Name'
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title='Phone Number'
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Street Address
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.street}
-                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title='Street Address'
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Locality/Area
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.locality}
-                        onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        title='Locality/Area'
-                        required
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          City
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title="City"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          State
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title="State"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Postal Code
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.postalCode}
-                          onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title='Postal Code'
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Country
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.country}
-                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          title="Country"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="isDefault"
-                        checked={formData.isDefault}
-                        onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      />
-                      <label htmlFor="isDefault" className="ml-2 block text-sm text-gray-900">
-                        Set as default address
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex justify-end space-x-3">
-                    <button
-                      onClick={() => {
-                        setShowAddForm(false);
-                        setEditingAddress(null);
-                      }}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium disabled:text-gray-400"
-                      type="button"
-                      disabled={isFetching}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-gray-900 text-white font-medium hover:bg-gray-800 disabled:bg-gray-400"
-                      type="submit"
-                      disabled={isFetching}
-                    >
-                      {isFetching ? (
-                        <span className="flex items-center">
-                          <span className="w-4 h-4 border-2 border-white border-t-transparent  animate-spin mr-2"></span>
-                          Saving...
-                        </span>
-                      ) : (
-                        editingAddress ? 'Update Address' : 'Save Address'
-                      )}
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
           )}
