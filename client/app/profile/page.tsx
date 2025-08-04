@@ -15,9 +15,22 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { fetchOrders } from '@/redux/slices/orderSlice';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { updateProfile } from '@/redux/slices/userSlice';
 
 // Edit Profile Modal Component
-const EditProfileModal = ({ isOpen, onClose, currentUser, onSave }) => {
+type EditProfileModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  currentUser: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    dateOfBirth?: string;
+  };
+  onSave: (formData: { name: string; email: string; phone: string; dateOfBirth: string }) => void;
+};
+
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, currentUser, onSave }) => {
   const [formData, setFormData] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
@@ -25,7 +38,7 @@ const EditProfileModal = ({ isOpen, onClose, currentUser, onSave }) => {
     dateOfBirth: currentUser?.dateOfBirth ? new Date(currentUser.dateOfBirth).toISOString().split('T')[0] : ''
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -33,7 +46,7 @@ const EditProfileModal = ({ isOpen, onClose, currentUser, onSave }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSave(formData);
     onClose();
@@ -154,9 +167,9 @@ const ProfilePage = () => {
     }
   }, [dispatch, isAuthenticated, ordersInitialized, ordersFetching]);
 
-  const handleSaveProfile = (updatedData) => {
+  const handleSaveProfile = (updatedData: { name: string; email: string; phone: string; dateOfBirth: string }) => {
     // Here you would dispatch an action to update the user profile
-    // dispatch(updateUserProfile(updatedData));
+    dispatch(updateProfile(updatedData));
     console.log('Updated profile data:', updatedData);
     // You can add your API call or Redux action here
   };
@@ -337,7 +350,14 @@ const ProfilePage = () => {
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        currentUser={currentUser}
+        currentUser={{
+          ...currentUser,
+          dateOfBirth: currentUser.dateOfBirth
+            ? typeof currentUser.dateOfBirth === 'string'
+              ? currentUser.dateOfBirth
+              : currentUser.dateOfBirth.toISOString()
+            : undefined
+        }}
         onSave={handleSaveProfile}
       />
       <Footer />
