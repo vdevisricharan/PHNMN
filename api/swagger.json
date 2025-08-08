@@ -1668,7 +1668,8 @@
           "name": {"type": "string", "minLength": 2, "maxLength": 50, "example": "John Doe"},
           "email": {"type": "string", "format": "email", "example": "john.doe@example.com"},
           "password": {"type": "string", "minLength": 6, "maxLength": 100, "example": "SecurePass123!"},
-          "phone": {"type": "string", "pattern": "^[+]?[1-9]\\d{1,14}$", "example": "+1234567890"}
+          "phone": {"type": "string", "pattern": "^[+]?[1-9]\\d{1,14}$", "example": "+1234567890"},
+          "dateOfBirth": {"type": "string", "format": "date", "example": "1990-01-01"}
         },
         "required": ["name", "email", "password"]
       },
@@ -1765,9 +1766,12 @@
             "type": "array",
             "items": {"$ref": "#/components/schemas/WalletTransaction"}
           },
-          "pagination": {"$ref": "#/components/schemas/PaginationInfo"}
+          "page": {"type": "integer", "example": 1},
+          "limit": {"type": "integer", "example": 10},
+          "total": {"type": "integer", "example": 50},
+          "hasMore": {"type": "boolean", "example": true}
         },
-        "required": ["transactions", "pagination"]
+        "required": ["transactions", "page", "limit", "total", "hasMore"]
       },
       "PointsDetails": {
         "type": "object",
@@ -1809,9 +1813,12 @@
             "type": "array",
             "items": {"$ref": "#/components/schemas/PointsTransaction"}
           },
-          "pagination": {"$ref": "#/components/schemas/PaginationInfo"}
+          "page": {"type": "integer", "example": 1},
+          "limit": {"type": "integer", "example": 10},
+          "total": {"type": "integer", "example": 50},
+          "hasMore": {"type": "boolean", "example": true}
         },
-        "required": ["transactions", "pagination"]
+        "required": ["transactions", "page", "limit", "total", "hasMore"]
       },
       "AddToWishlist": {
         "type": "object",
@@ -2122,21 +2129,11 @@
             "type": "array",
             "items": {"$ref": "#/components/schemas/Order"}
           },
-          "pagination": {"$ref": "#/components/schemas/PaginationInfo"},
-          "summary": {
-            "type": "object",
-            "properties": {
-              "totalOrders": {"type": "number"},
-              "totalSpent": {"type": "number"},
-              "averageOrderValue": {"type": "number"},
-              "statusCounts": {
-                "type": "object",
-                "additionalProperties": {"type": "number"}
-              }
-            }
-          }
+          "currentPage": {"type": "integer", "example": 1},
+          "totalPages": {"type": "integer", "example": 5},
+          "hasMore": {"type": "boolean", "example": true}
         },
-        "required": ["orders", "pagination"]
+        "required": ["orders", "currentPage", "totalPages", "hasMore"]
       },
       "PaymentIntentRequest": {
         "type": "object",
@@ -2225,6 +2222,17 @@
           "hasPrevPage": {"type": "boolean", "example": false}
         },
         "required": ["currentPage", "totalPages", "totalItems", "itemsPerPage", "hasNextPage", "hasPrevPage"]
+      },
+      "CartItemResponse": {
+        "type": "object",
+        "properties": {
+          "productId": {"$ref": "#/components/schemas/Product"},
+          "size": {"type": "string", "example": "M"},
+          "color": {"type": "string", "example": "Blue"},
+          "quantity": {"type": "number", "example": 2},
+          "addedAt": {"type": "string", "format": "date-time"}
+        },
+        "required": ["productId", "quantity", "addedAt"]
       }
     }
   },
